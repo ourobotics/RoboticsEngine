@@ -64,6 +64,12 @@ class NetworkClient(object):
 					"Time": (time() - WATCH)
 				}
 
+	def pingServer(self):
+		command = "#00001 - Requesting Connection Time Test"
+		self.connectionHolder.send(str(command).encode())
+		recieveddata = self.connectionHolder.recv(1024).decode()
+		print(recieveddata)
+
 	def closeConnection(self):
 		WATCH = time()
 		command = "#99999 - Requesting Connection Closure"

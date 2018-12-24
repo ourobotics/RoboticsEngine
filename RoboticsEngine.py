@@ -11,7 +11,7 @@
 # ||============================================================================||
 # ||=======================||
 # Routes
-from Routes.Routes import Routes
+from System.Routes import Routes
 # Controllers
 
 # Server
@@ -21,6 +21,7 @@ from NetworkClient import NetworkClient
 # Test
 
 # Premades
+from time import sleep
 from threading import Thread
 # ||=======================||
 # Global Variables
@@ -37,6 +38,9 @@ class RoboticsEngine(object):
         # return
         self.networkclient = NetworkClient()
         self.networkclient.establishConnection()
-        self.networkclient.closeConnection()
+        while 1:
+            self.networkclient.pingServer()
+            sleep(10)
+        # self.networkclient.closeConnection()
 
 re = RoboticsEngine()

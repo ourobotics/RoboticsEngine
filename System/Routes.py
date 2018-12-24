@@ -34,12 +34,8 @@ class Routes(object):
 		self.initializeRoutes()
 
 	def initializeRoutes(self):
-		sys.path.insert(0, './Config/')
-		sys.path.insert(0, './Controllers/')
-		sys.path.insert(0, './Server/')
-		sys.path.insert(0, './Tools/')
-		sys.path.insert(0, './Test/')
-		sys.path.insert(0, './Test/TestLibrary/')
+		for line in open('./Config/' + 'Routes.sys'):
+			sys.path.insert(0, line.replace('\n',''))
 
 Routes()
 
