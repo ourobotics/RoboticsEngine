@@ -1,4 +1,4 @@
-./Config/
+../Config/
 ./Controllers/
 ./Cache/
 ./Server/
