@@ -28,60 +28,64 @@ from time import sleep, time, strftime, localtime
 # ||===============================================================||
 
 class GpsController:
-	# def __init__(cls):
-	type = "GpsController"
-	duty = "Inactive"
-	active = False
-	latitude = 41.3507584
-	longitude = -81.8814976
+	def __init__(self):
+		self.type = "GpsController"
+		
+		self.active = False
+		
+		# ||=======================||
+		# Default Values
+		self.duty = "Inactive"
+		self.latitude = 41.3507584
+		self.longitude = -81.8814976
 
-	@classmethod
-	def jsonify(cls, message = "Null", time = -1, function = "jsonify"):
+	# @classmethod
+	def jsonify(self, message = "Null", time = -1, function = "jsonify"):
 		return {
 			"Generic Information": {
-				"_Class": cls.type,
+				"_Class": self.type,
 				"_Function": function,
-				"Duty": cls.duty,
+				"Duty": self.duty,
 				"Return Status": True,
-				"Activity": cls.active,
+				"Activity": self.active,
 				"Message": message,
 				"Time": time
 			},
 			"Specific Information": {
-				"Latitude": cls.latitude,
-				"Longitude": cls.longitude
+				"Latitude": self.latitude,
+				"Longitude": self.longitude
 			}
 		}
 
-	@classmethod
-	def updateCurrentDutyLog(cls, duty, function = "updateCurrentDutyLog"):
-		cls.duty = duty
-		EngineData.GpsController.pushInternalLog(cls.jsonify(
-			"Duty Update: " + cls.duty,
+	# @classmethod
+	def updateCurrentDutyLog(self, duty, function = "updateCurrentDutyLog"):
+		self.duty = duty
+		EngineData.GpsController.pushInternalLog(self.jsonify(
+			"Duty Update: " + self.duty,
 			str(strftime("%Y-%m-%d %H:%M:%S", localtime())),
 			function)
 		)
 
-	@classmethod
-	def updateCurrentDuty(cls, duty):
-		cls.duty = duty
+	# @classmethod
+	def updateCurrentDuty(self, duty):
+		self.duty = duty
 		return 0
 
-	@classmethod
-	def testMovement(cls):
-		cls.active = True
-		cls.updateCurrentDutyLog("Testing Gps Movement")
-		while cls.active:
-			cls.updateCurrentDuty("Testing Gps Movement")
+	# @classmethod
+	def testMovement(self):
+		self.active = True
+		self.updateCurrentDutyLog("Testing Gps Movement")
+		while self.active:
+			self.updateCurrentDuty("Testing Gps Movement")
 			for i in range(10):
-				cls.latitude -= 1
-				cls.longitude -= 1
-				# print(cls.latitude, cls.longitude)
+				self.latitude -= 1
+				self.longitude -= 1
+				# print(self.latitude, self.longitude)
 				sleep(1)
 			for i in range(10):
-				cls.latitude += 1
-				cls.longitude += 1
-				# print(cls.latitude, cls.longitude)
+				self.latitude += 1
+				self.longitude += 1
+				# print(self.latitude, self.longitude)
 				sleep(1)
-		cls.updateCurrentDutyLog("Stopping Gps Movement Tests")
+		self.updateCurrentDutyLog("Stopping Gps Movement Tests")
 			

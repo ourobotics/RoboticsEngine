@@ -28,56 +28,60 @@ from time import sleep, time, strftime, localtime
 # ||===============================================================||
 
 class ThermoController:
-	# def __init__(cls):
-	type = "ThermoController"
-	duty = "Inactive"
-	active = False
-	temperature = 40
-	degreeUnit = "Fahrenheit"
+	def __init__(self):
+		self.type = "ThermoController"
+		
+		self.active = False
+		
+		# ||=======================||
+		# Default Values
+		self.duty = "Inactive"
+		self.temperature = 40
+		self.degreeUnit = "Fahrenheit"
 
-	@classmethod
-	def jsonify(cls, message = "Null", time = -1, function = "jsonify"):
+	# @classmethod
+	def jsonify(self, message = "Null", time = -1, function = "jsonify"):
 		return {
 			"Generic Information": {
-				"_Class": cls.type,
+				"_Class": self.type,
 				"_Function": function,
-				"Duty": cls.duty,
+				"Duty": self.duty,
 				"Return Status": True,
-				"Activity": cls.active,
+				"Activity": self.active,
 				"Message": message,
 				"Time": time
 			},
 			"Specific Information": {
-				"Temperature": cls.temperature,
-				"Degree Unit": cls.degreeUnit
+				"Temperature": self.temperature,
+				"Degree Unit": self.degreeUnit
 			}
 		}
 
-	@classmethod
-	def updateCurrentDutyLog(cls, duty, function = "updateCurrentDutyLog"):
-		cls.duty = duty
-		EngineData.ThermoController.pushInternalLog(cls.jsonify(
-			"Duty Update: " + cls.duty,
+	# @classmethod
+	def updateCurrentDutyLog(self, duty, function = "updateCurrentDutyLog"):
+		self.duty = duty
+		EngineData.ThermoController.pushInternalLog(self.jsonify(
+			"Duty Update: " + self.duty,
 			str(strftime("%Y-%m-%d %H:%M:%S", localtime())),
 			function)
 		)
 
-	@classmethod
-	def updateCurrentDuty(cls, duty):
-		cls.duty = duty
+	# @classmethod
+	def updateCurrentDuty(self, duty):
+		self.duty = duty
 		return 0
 
-	@classmethod
-	def testTemperature(cls):
-		cls.active = True
-		cls.updateCurrentDutyLog("Testing Temperature")
-		while cls.active:
-			cls.updateCurrentDuty("Testing Temperature")
+	# @classmethod
+	def testTemperature(self):
+		self.active = True
+		self.updateCurrentDutyLog("Testing Temperature")
+		while self.active:
+			self.updateCurrentDuty("Testing Temperature")
 			for i in range(10):
-				cls.temperature += 1
+				self.temperature += 1
 				sleep(1)
 			for i in range(10):
-				cls.temperature -= 1
+				self.temperature -= 1
 				sleep(1)
-		cls.updateCurrentDutyLog("Stopping Temperature Tests")
+		self.updateCurrentDutyLog("Stopping Temperature Tests")
 			
