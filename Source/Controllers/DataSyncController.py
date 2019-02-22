@@ -34,27 +34,26 @@ class DataSyncController:
 	def __init__(self, networkClient):
 		self.type = "DataSyncController"
 		self.duty = "Inactive"
-		self.active = False
 		self.networkClient = networkClient
 	
 	# @classmethod
 	def syncLiveData(self):
-		self.active = True
-		while self.active:
-			if (self.networkClient.isOnline()):
-				gpsControllerData = EngineData.GpsController.getLiveData()
-				if (gpsControllerData != None):
-					self.networkClient.sendJson("#40001", gpsControllerData)
+		while (1):
+			while self.networkClient.connectionStatus:
+				if (self.networkClient.isOnline()):
+					gpsControllerData = EngineData.GpsController.getLiveData()
+					if (gpsControllerData != None):
+						self.networkClient.sendJson("#40001", gpsControllerData)
 
-				thermoControllerData = EngineData.ThermoController.getLiveData()
-				if (thermoControllerData != None):
-					self.networkClient.sendJson("#40005", thermoControllerData)
+					thermoControllerData = EngineData.ThermoController.getLiveData()
+					if (thermoControllerData != None):
+						self.networkClient.sendJson("#40005", thermoControllerData)
 
-				energyControllerData = EngineData.EnergyController.getLiveData()
-				if (energyControllerData != None):
-					self.networkClient.sendJson("#40007", energyControllerData)
+					energyControllerData = EngineData.EnergyController.getLiveData()
+					if (energyControllerData != None):
+						self.networkClient.sendJson("#40007", energyControllerData)
 
-			sleep(1)
+				sleep(1)
 
 	# def jsonify(self, message = "Null", time = -1, function = "jsonify"):
 	# 	return {
