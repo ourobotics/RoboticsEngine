@@ -50,6 +50,12 @@ class RoboticsEngine(object):
 		# Program Classes
         self.networkClient = NetworkClient()
         self.dataSyncController = DataSyncController(self.networkClient)
+<<<<<<< HEAD
+=======
+        self.energyController = EnergyController()
+        self.thermoController = ThermoController()
+        self.gpsController = GpsController()
+>>>>>>> 44abefc05169eeb64e79ddb7ec2d5864befc5852
 
     def main(self):
         # ||=======================||
@@ -63,34 +69,34 @@ class RoboticsEngine(object):
             self.dataSyncControllerThread.setDaemon(True)
             self.dataSyncControllerThread.start()
         if (self.useGpsController):
-            self.gpsControllerThread = Thread(target = GpsController.testMovement)
+            self.gpsControllerThread = Thread(target = self.gpsController.testMovement)
             self.gpsControllerThread.setDaemon(True)
             self.gpsControllerThread.start()
         if (self.useThermoController):
-            self.thermoControllerThread = Thread(target = ThermoController.testTemperature)
+            self.thermoControllerThread = Thread(target = self.thermoController.testTemperature)
             self.thermoControllerThread.setDaemon(True)
             self.thermoControllerThread.start()
         if (self.useEnergyController):
-            self.energyControllerThread = Thread(target = EnergyController.testEnergy)
+            self.energyControllerThread = Thread(target = self.energyController.testEnergy)
             self.energyControllerThread.setDaemon(True)
             self.energyControllerThread.start()
             
         try:
             while True:
                 if (self.useGpsController):
-                    gpsControllerData = GpsController.jsonify(
+                    gpsControllerData = self.gpsController.jsonify(
                         "Requesting Current Cache", 
                         str(strftime("%Y-%m-%d %H:%M:%S", localtime())))
                     EngineData.GpsController.setLiveData(gpsControllerData) 
                         
                 if (self.useThermoController):
-                    thermoControllerData = ThermoController.jsonify(
+                    thermoControllerData = self.thermoController.jsonify(
                         "Requesting Current Cache", 
                         str(strftime("%Y-%m-%d %H:%M:%S", localtime())))
                     EngineData.ThermoController.setLiveData(thermoControllerData)
                 
                 if(self.useEnergyController):
-                    energyControllerData = EnergyController.jsonify(
+                    energyControllerData = self.energyController.jsonify(
                         "Requesting Current Cache", 
                         str(strftime("%Y-%m-%d %H:%M:%S", localtime())))
                     EngineData.EnergyController.setLiveData(energyControllerData)

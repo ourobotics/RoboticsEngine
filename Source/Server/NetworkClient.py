@@ -13,7 +13,7 @@
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
 # Import Modules
-from time import time, sleep
+from time import sleep, time, strftime, localtime
 import socket
 from socket import timeout
 from socket import error
@@ -244,7 +244,7 @@ class NetworkClient:
 				self.debugLogger.log("Standard", self.type + ': ' + logMessage)
 			except Exception as e:
 				logMessage = e
-				self.debugLogger.log("Error", self.type + ': ' + logMessage)
+				self.debugLogger.log("Error", self.type + ': ' + str(logMessage))
 				self.connectionStatus = False
 				self.establishConnection()
 				return self.jsonify(

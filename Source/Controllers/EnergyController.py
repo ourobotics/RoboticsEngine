@@ -15,6 +15,7 @@
 # Services
 # Controllers
 # Tools
+from ConfigLoader import ConfigLoader
 # Test
 # Data
 from EngineData import EngineData
@@ -28,56 +29,60 @@ from time import sleep, time, strftime, localtime
 # ||===============================================================||
 
 class EnergyController:
-	# def __init__(cls):
-	type = "ThermoController"
-	duty = "Inactive"
-	active = False
-	energy = 80
-	batteryUnit = "Percentage"
+	def __init__(self):
+		self.type = "ThermoController"
+		
+		self.active = False
 
-	@classmethod
-	def jsonify(cls, message = "Null", time = -1, function = "jsonify"):
+		# ||=======================||
+		# Default Values
+		self.duty = "Inactive"
+		self.energy = 80
+		self.batteryUnit = "Percentage"
+
+	# @classmethod
+	def jsonify(self, message = "Null", time = -1, function = "jsonify"):
 		return {
 			"Generic Information": {
-				"_Class": cls.type,
+				"_Class": self.type,
 				"_Function": function,
-				"Duty": cls.duty,
+				"Duty": self.duty,
 				"Return Status": True,
-				"Activity": cls.active,
+				"Activity": self.active,
 				"Message": message,
 				"Time": time
 			},
 			"Specific Information": {
-				"Energy": cls.energy,
-				"Battery Unit": cls.batteryUnit
+				"Energy": self.energy,
+				"Battery Unit": self.batteryUnit
 			}
 		}
 
-	@classmethod
-	def updateCurrentDutyLog(cls, duty, function = "updateCurrentDutyLog"):
-		cls.duty = duty
-		EngineData.EnergyController.pushInternalLog(cls.jsonify(
-			"Duty Update: " + cls.duty,
+	# @classmethod
+	def updateCurrentDutyLog(self, duty, function = "updateCurrentDutyLog"):
+		self.duty = duty
+		EngineData.EnergyController.pushInternalLog(self.jsonify(
+			"Duty Update: " + self.duty,
 			str(strftime("%Y-%m-%d %H:%M:%S", localtime())),
 			function)
 		)
 
-	@classmethod
-	def updateCurrentDuty(cls, duty):
-		cls.duty = duty
+	# @classmethod
+	def updateCurrentDuty(self, duty):
+		self.duty = duty
 		return 0
 
-	@classmethod
-	def testEnergy(cls):
-		cls.active = True
-		cls.updateCurrentDutyLog("Testing Energy")
-		while cls.active:
-			cls.updateCurrentDuty("Testing Energy")
+	# @classmethod
+	def testEnergy(self):
+		self.active = True
+		self.updateCurrentDutyLog("Testing Energy")
+		while self.active:
+			self.updateCurrentDuty("Testing Energy")
 			for i in range(10):
-				cls.energy += 1
+				self.energy += 1
 				sleep(1)
 			for i in range(10):
-				cls.energy -= 1
+				self.energy -= 1
 				sleep(1)
-		cls.updateCurrentDutyLog("Stopping Energy Tests")
+		self.updateCurrentDutyLog("Stopping Energy Tests")
 			
