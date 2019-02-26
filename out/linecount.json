@@ -1,0 +1,351 @@
+{
+    "extension": "linecount",
+    "version": "0.1.7",
+    "workspace": "c:\\Users\\Logan\\Workspace\\RoboticsEngine",
+    "linecount": [
+        {
+            "version": "0.1.7",
+            "counttime": "2019-02-26 06:38:00",
+            "filesum": 52,
+            "codesum": 1057,
+            "commentsum": 617,
+            "blanksum": 284,
+            "filelist": [
+                {
+                    "blank": 0,
+                    "code": 5,
+                    "comment": 3,
+                    "filename": ".gitignore"
+                },
+                {
+                    "blank": 0,
+                    "code": 5,
+                    "comment": 0,
+                    "filename": "Config\\DataSyncController.conf"
+                },
+                {
+                    "blank": 0,
+                    "code": 5,
+                    "comment": 0,
+                    "filename": "Config\\EnergyControllerCache.conf"
+                },
+                {
+                    "blank": 0,
+                    "code": 6,
+                    "comment": 0,
+                    "filename": "Config\\EngineDataController.conf"
+                },
+                {
+                    "blank": 0,
+                    "code": 9,
+                    "comment": 0,
+                    "filename": "Config\\NetworkClient.conf"
+                },
+                {
+                    "blank": 0,
+                    "code": 5,
+                    "comment": 0,
+                    "filename": "Config\\NetworkClientCache.conf"
+                },
+                {
+                    "blank": 0,
+                    "code": 5,
+                    "comment": 0,
+                    "filename": "Config\\RoboticsEngine.conf"
+                },
+                {
+                    "blank": 0,
+                    "code": 9,
+                    "comment": 0,
+                    "filename": "Config\\Routes.sys"
+                },
+                {
+                    "blank": 0,
+                    "code": 51,
+                    "comment": 0,
+                    "filename": "Logs\\NetworkClient;0;50;Tue;26-02-2019;06-21-48.log"
+                },
+                {
+                    "blank": 0,
+                    "code": 51,
+                    "comment": 0,
+                    "filename": "Logs\\NetworkClient;0;50;Tue;26-02-2019;06-24-53.log"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "Logs\\README.md"
+                },
+                {
+                    "blank": 1,
+                    "code": 2,
+                    "comment": 0,
+                    "filename": "README.md"
+                },
+                {
+                    "filename": "Source\\Cache\\__pycache__\\EngineData.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Cache\\__pycache__\\EngineData.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Cache\\__pycache__\\NetworkClientCache.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 12,
+                    "code": 32,
+                    "comment": 38,
+                    "filename": "Source\\Cache\\EnergyControllerCache.py"
+                },
+                {
+                    "blank": 10,
+                    "code": 32,
+                    "comment": 37,
+                    "filename": "Source\\Cache\\GpsControllerCache.py"
+                },
+                {
+                    "blank": 11,
+                    "code": 32,
+                    "comment": 38,
+                    "filename": "Source\\Cache\\MechanicalControllerCache.py"
+                },
+                {
+                    "blank": 12,
+                    "code": 34,
+                    "comment": 37,
+                    "filename": "Source\\Cache\\NetworkClientCache.py"
+                },
+                {
+                    "blank": 11,
+                    "code": 32,
+                    "comment": 38,
+                    "filename": "Source\\Cache\\ThermoControllerCache.py"
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\DataSyncController.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\DataSyncController.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\EnergyController.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\EnergyController.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\EngineDataController.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\GpsController.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\GpsController.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\ThermoController.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Controllers\\__pycache__\\ThermoController.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 27,
+                    "code": 59,
+                    "comment": 55,
+                    "filename": "Source\\Controllers\\DataSyncController.py"
+                },
+                {
+                    "blank": 14,
+                    "code": 51,
+                    "comment": 38,
+                    "filename": "Source\\Controllers\\EnergyController.py"
+                },
+                {
+                    "blank": 42,
+                    "code": 116,
+                    "comment": 49,
+                    "filename": "Source\\Controllers\\EngineDataController.py"
+                },
+                {
+                    "blank": 11,
+                    "code": 60,
+                    "comment": 40,
+                    "filename": "Source\\Controllers\\GpsController.py"
+                },
+                {
+                    "blank": 14,
+                    "code": 51,
+                    "comment": 38,
+                    "filename": "Source\\Controllers\\ThermoController.py"
+                },
+                {
+                    "blank": 32,
+                    "code": 86,
+                    "comment": 55,
+                    "filename": "Source\\MultiRoboticsEngine.py"
+                },
+                {
+                    "filename": "Source\\Network\\__pycache__\\NetworkClient.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Network\\__pycache__\\NetworkClient.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 43,
+                    "code": 184,
+                    "comment": 48,
+                    "filename": "Source\\Network\\NetworkClient.py"
+                },
+                {
+                    "blank": 11,
+                    "code": 65,
+                    "comment": 32,
+                    "filename": "Source\\RoboticsEngine.py"
+                },
+                {
+                    "filename": "Source\\System\\__pycache__\\__init__.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\System\\__pycache__\\__init__.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\System\\__pycache__\\Routes.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\System\\__pycache__\\Routes.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 11,
+                    "code": 8,
+                    "comment": 23,
+                    "filename": "Source\\System\\Routes.py"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "Source\\Test\\README.md"
+                },
+                {
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0,
+                    "filename": "Source\\TestPlatform.py"
+                },
+                {
+                    "filename": "Source\\Tools\\__pycache__\\ConfigLoader.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Tools\\__pycache__\\ConfigLoader.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Tools\\__pycache__\\DebugLogger.cpython-36.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "filename": "Source\\Tools\\__pycache__\\DebugLogger.cpython-37.pyc",
+                    "isbinaryfile": true,
+                    "blank": 0,
+                    "code": 0,
+                    "comment": 0
+                },
+                {
+                    "blank": 8,
+                    "code": 13,
+                    "comment": 24,
+                    "filename": "Source\\Tools\\ConfigLoader.py"
+                },
+                {
+                    "blank": 14,
+                    "code": 49,
+                    "comment": 24,
+                    "filename": "Source\\Tools\\DebugLogger.py"
+                }
+            ]
+        }
+    ]
+}

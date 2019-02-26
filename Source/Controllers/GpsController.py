@@ -15,9 +15,10 @@
 # Services
 # Controllers
 # Tools
+from ConfigLoader import ConfigLoader
+from DebugLogger import DebugLogger
 # Test
 # Data
-from EngineData import EngineData
 # Premades
 from time import sleep, time, strftime, localtime
 # ||=======================||
@@ -33,6 +34,26 @@ class GpsController:
 		
 		self.active = False
 		
+		# ||=======================||
+		# Program Classes
+		configLoader = ConfigLoader()
+		self.config = configLoader.getConfig(self.type)
+
+		self.debugLogger = DebugLogger(self.type)
+		self.debugLogger.setMessageSettings(
+			ast.literal_eval(self.config["Debug"]),
+			ast.literal_eval(self.config["Standard"]),
+			ast.literal_eval(self.config["Warning"]),
+			ast.literal_eval(self.config["Error"]))
+
+		# ||=======================||
+		# Communication Pipes
+
+		# ||=======================||
+		# Config <bool>
+		self.debug = self.config["Debug"]
+		self.log = self.config["Log"]
+
 		# ||=======================||
 		# Default Values
 		self.duty = "Inactive"

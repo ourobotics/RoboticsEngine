@@ -14,6 +14,7 @@
 from System.Routes import Routes
 # Controllers
 from DataSyncController import DataSyncController
+from EngineDataController import EngineDataController
 from GpsController import GpsController
 from ThermoController import ThermoController
 from EnergyController import EnergyController
@@ -24,13 +25,12 @@ from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
 # Test
 # Cache
-from EngineData import EngineData
 # Premades
-from time import sleep, time, strftime, localtime
+from multiprocessing import Process, Pipe
 from threading import Thread
+from time import sleep, time, strftime, localtime
 import traceback
 import os
-from multiprocessing import Process, Pipe
 import ast
 # ||=======================||
 # Global Variables
@@ -45,19 +45,29 @@ class RoboticsEngine(object):
 	def __init__(self):
 		self.type = "RoboticsEngine"
 
-		self.config = self.loadConfig(self.type)
-
 		self.active = False
 
 		# ||=======================||
 		# Program Config Varaibles
 		self.useNetworkClient = True
 		self.useDataSyncController = True
+		self.useEngineDataController = True
 
 		# ||=======================||
 		# Program Classes
 		self.networkClient = NetworkClient()
 		self.dataSyncController = DataSyncController()
+		self.engineDataController = EngineDataController()
+
+		configLoader = ConfigLoader()
+		self.config = configLoader.getConfig(self.type)
+
+		self.debugLogger = DebugLogger(self.type)
+		self.debugLogger.setMessageSettings(
+			ast.literal_eval(self.config["Debug"]),
+			ast.literal_eval(self.config["Standard"]),
+			ast.literal_eval(self.config["Warning"]),
+			ast.literal_eval(self.config["Error"]))
 
 		# ||=======================||
 		# Config <bool>
@@ -66,54 +76,6 @@ class RoboticsEngine(object):
 
 		# ||=======================||
 		# Defaults
-		self.debugLogger = DebugLogger(self.type)
-		self.debugLogger.setMessageSettings(
-			ast.literal_eval(self.config["Debug"]),
-			ast.literal_eval(self.config["Standard"]),
-			ast.literal_eval(self.config["Warning"]),
-			ast.literal_eval(self.config["Error"]))
-
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-
-	def loadConfig(self, configName):
-		configLoader = ConfigLoader()
-		config = configLoader.getConfig(configName)
-		return config
-
-	# |============================================================================|
-
-	def checkDebug(self):
-		if (self.debug == True):
-			return "Debug"
-		return ""
-
-	# |============================================================================|
-
-	def updateCurrentDutyLog(self, duty, function = "updateCurrentDutyLog"):
-		self.duty = duty
-		DeviceData.NetworkServer.pushInternalLog(self.jsonify(
-			"Duty Update: " + self.duty,
-			str(strftime("%a;%d-%m-%Y;%H:%M:%S", localtime())),
-			function)
-		)
-		return 0
 
 	# |============================================================================|
 
@@ -122,50 +84,76 @@ class RoboticsEngine(object):
 		return 0
 
 	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
 
+	def jsonify(self, message = "Null", time = -1, function = "jsonify"):
+		return {
+			"Generic Information": {
+				"_Class": self.type,
+				"_Function": function,
+				"Duty": self.duty,
+				"Return Status": True,
+				"Activity": self.active,
+				"Message": message,
+				"Time": time
+			},
+			"Specific Information": {
+			}
+		}
+
+	# |============================================================================|
 
 	def main(self):
 		# ||=======================||
+		# Pipes
+
+		# ||=======================||
+		# NetworkClient Pipes
+		# NetworkClient <-> DataSyncController Pipe
+		self.NCDSCppipe, self.NCDSCcpipe = Pipe()
+		# NetworkClient <-> NetworkClient Pipe
+		self.EDCNCppipe, self.EDCNCcpipe = Pipe()
+		
+		# ||=======================||
+		# EngineDataController Pipes
+		# EngineDataController <-> DataSyncController Pipe
+		self.EDCDSCppipe, self.EDCDSCcpipe = Pipe()
+
+
+		# ||=======================||
 		# Program Setup
 		if (self.useNetworkClient):
-			self.networkClientProcessPPipe, self.networkClientProcessCPipe = Pipe()
-			self.networkClientProcess = Process(target = self.networkClient.createProcess, args=(self.networkClientProcessCPipe,))
+			self.networkClient.pushChildPipe(self.NCDSCcpipe)
+			self.networkClient.pushChildPipe(self.EDCNCcpipe)
+
+			self.networkClientProcess = Process(target = self.networkClient.createProcess)
 			self.networkClientProcess.daemon = True
 			self.networkClientProcess.start()
 
+
 			if (self.useDataSyncController):
-				self.dataSyncController.initializeNetworkClientPipe(self.networkClientProcessPPipe)
+				self.dataSyncController.initializeNetworkClientPipe(self.NCDSCppipe)
+				self.dataSyncController.initializeEngineDataControllerPipe(self.EDCDSCppipe)
 				
-				self.dataSyncControllerPPipe, self.dataSyncControllerCPipe = Pipe()
 				self.dataSyncControllerProcess = Process(target = self.dataSyncController.createProcess)
 				self.dataSyncControllerProcess.daemon = True
 				self.dataSyncControllerProcess.start()
 				
+		if (self.useEngineDataController):
+			self.engineDataController.pushChildPipe(self.EDCDSCcpipe)
+
+			self.engineDataController.initializeNetworkClientPipe(self.EDCNCppipe)
+
+			self.engineDataControllerProcess = Process(target = self.engineDataController.createProcess)
+			self.engineDataControllerProcess.daemon = True
+			self.engineDataControllerProcess.start()
 		
 		
 		try:
 			while(1):
 				# logMessage = "Running"
 				# self.debugLogger.log("Standard", logMessage)
-				# self.networkClientProcessPPipe.send(["jsonify"])
-				# print(self.networkClientProcessPPipe.recv())
+				# self.networkClientProcessppipe.send(["jsonify"])
+				# print(self.networkClientProcessppipe.recv())
 				sleep(10)
 				# continue
 		except KeyboardInterrupt as e:

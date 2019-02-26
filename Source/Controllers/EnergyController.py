@@ -16,9 +16,9 @@
 # Controllers
 # Tools
 from ConfigLoader import ConfigLoader
+from DebugLogger import DebugLogger
 # Test
 # Data
-from EngineData import EngineData
 # Premades
 from time import sleep, time, strftime, localtime
 # ||=======================||
@@ -35,12 +35,39 @@ class EnergyController:
 		self.active = False
 
 		# ||=======================||
+		# Program Classes
+		configLoader = ConfigLoader()
+		self.config = configLoader.getConfig(self.type)
+
+		self.debugLogger = DebugLogger(self.type)
+		self.debugLogger.setMessageSettings(
+			ast.literal_eval(self.config["Debug"]),
+			ast.literal_eval(self.config["Standard"]),
+			ast.literal_eval(self.config["Warning"]),
+			ast.literal_eval(self.config["Error"]))
+
+		# ||=======================||
+		# Communication Pipes
+
+		# ||=======================||
+		# Config <bool>
+		self.debug = self.config["Debug"]
+		self.log = self.config["Log"]
+
+		# ||=======================||
 		# Default Values
 		self.duty = "Inactive"
 		self.energy = 80
 		self.batteryUnit = "Percentage"
 
-	# @classmethod
+	# |============================================================================|
+
+	def updateCurrentDuty(self, duty):
+		self.duty = duty
+		return 0
+
+	# |============================================================================|
+
 	def jsonify(self, message = "Null", time = -1, function = "jsonify"):
 		return {
 			"Generic Information": {
@@ -58,21 +85,8 @@ class EnergyController:
 			}
 		}
 
-	# @classmethod
-	def updateCurrentDutyLog(self, duty, function = "updateCurrentDutyLog"):
-		self.duty = duty
-		EngineData.EnergyController.pushInternalLog(self.jsonify(
-			"Duty Update: " + self.duty,
-			str(strftime("%Y-%m-%d %H:%M:%S", localtime())),
-			function)
-		)
+	# |============================================================================|
 
-	# @classmethod
-	def updateCurrentDuty(self, duty):
-		self.duty = duty
-		return 0
-
-	# @classmethod
 	def testEnergy(self):
 		self.active = True
 		self.updateCurrentDutyLog("Testing Energy")
@@ -86,3 +100,4 @@ class EnergyController:
 				sleep(1)
 		self.updateCurrentDutyLog("Stopping Energy Tests")
 			
+# |===============================================================|

@@ -14,16 +14,16 @@ from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
 # Import Modules
 from time import sleep, time, strftime, localtime
-import socket
 from socket import timeout
 from socket import error
 from socket import create_connection
+from threading import Thread
+from functools import partial
+import socket
 import traceback
 import pickle
 import ast
-from threading import Thread
 import sys
-from functools import partial
 # ||=======================||
 # Notes
 #
@@ -36,27 +36,13 @@ from functools import partial
 class NetworkClient:
 	def __init__(self):
 		self.type = "NetworkClient"
-		
-		self.config = self.loadConfig(self.type)
 
 		self.active = False
 
 		# ||=======================||
-		# Config <bool>
-		self.debug = self.config["Debug"]
-		self.log = self.config["Log"]
-
-		# ||=======================||
-		# Config <string>
-		self.host = self.config[self.checkDebug() + "Address"]
-		self.port = self.config[self.checkDebug() + "Port"]
-
-		# ||=======================||
-		# Defaults
-		self.duty = "Inactive"
-		self.connectionStatus = False
-		self.connectionHolder = socket.socket()
-		self.socketTimeout = 1
+		# Program Classes
+		configLoader = ConfigLoader()
+		self.config = configLoader.getConfig(self.type)
 
 		self.debugLogger = DebugLogger(self.type)
 		self.debugLogger.setMessageSettings(
@@ -65,53 +51,23 @@ class NetworkClient:
 			ast.literal_eval(self.config["Warning"]),
 			ast.literal_eval(self.config["Error"]))
 
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
+		# ||=======================||
+		# Config <bool>
+		self.debug = self.config["Debug"]
+		self.log = self.config["Log"]
 
-	def loadConfig(self, configName):
-		configLoader = ConfigLoader()
-		config = configLoader.getConfig(configName)
-		
-		try:
-			logMessage = "Reloading Config"
-			self.debugLogger.log("Debug", self.type + ': ' + logMessage)
-		except Exception as e:
-			return config
-		return config
+		# ||=======================||
+		# Config <string>
+		self.host = self.config["Address"]
+		self.port = self.config["Port"]
 
-	# |============================================================================|
-
-	def checkDebug(self):
-		if (self.debug == True):
-			return "Debug"
-		return ""
-
-	# |============================================================================|
-
-	def updateCurrentDutyLog(self, duty, function = "updateCurrentDutyLog"):
-		self.duty = duty
-		DeviceData.NetworkServer.pushInternalLog(self.jsonify(
-			"Duty Update: " + self.duty,
-			str(strftime("%a;%d-%m-%Y;%H:%M:%S", localtime())),
-			function)
-		)
-		return 0
+		# ||=======================||
+		# Defaults
+		self.duty = "Inactive"
+		self.connectionStatus = False
+		self.connectionHolder = socket.socket()
+		self.socketTimeout = 1
+		self.childPipes = []
 
 	# |============================================================================|
 
@@ -119,23 +75,6 @@ class NetworkClient:
 		self.duty = duty
 		return 0
 
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
-	# |============================================================================|
 	# |============================================================================|
 
 	def jsonify(self, message = "Null", time = strftime("%a;%d-%m-%Y;%H:%M:%S", localtime()), function = "jsonify"):
@@ -160,34 +99,51 @@ class NetworkClient:
 
 	# |============================================================================|
 
-	def communicationModule(self, comPipe):
-		while (1):
-			dataRecv = comPipe.recv() * 3
-			# print(dataRecv)
-			logMessage = "Reading From Pipe"
-			self.debugLogger.log("Debug", self.type + ': ' + logMessage)
-
-			interactionAccess = {
-				"pingServer": partial(self.pingServer),
-				"jsonify": partial(self.jsonify),
-				"reLoadConfig": partial(self.loadConfig, self.type),
-				"sendJson": partial(self.sendJson, dataRecv[1], dataRecv[2]),
-				"closeConnection": partial(self.closeConnection),
-				"updateDuty": partial(self.updateCurrentDuty, dataRecv[1]),
-				"isOnline": partial(self.isOnline)
-			}
-			returnData = interactionAccess[dataRecv[0]]()
-
-			logMessage = "Executing Pipe Command"
-			self.debugLogger.log("Debug", self.type + ': ' + logMessage)
-
-			comPipe.send(returnData)
+	def pushChildPipe(self, pipe):
+		pipe.poll(0.5)
+		self.childPipes.append(pipe)	
 
 	# |============================================================================|
 
-	def createProcess(self, comPipe):
+	def communicationModule(self):
+		while (1):
+			if (len(self.childPipes) != 0):
+				dataRecv = None
+				while (dataRecv == None):
+					for i in range(len(self.childPipes)):
+						pipe = self.childPipes[i]
+						# print("Pipe:",i)
+						try:
+							if (pipe.poll(0.5)):
+								dataRecv = pipe.recv() * 3
+						except Exception as e:
+							print(e)
+				# print(dataRecv)
+
+				logMessage = "Reading From Pipe: " + str(dataRecv)
+				self.debugLogger.log("Debug", self.type + ': ' + logMessage)
+
+				interactionAccess = {
+					"pingServer": partial(self.pingServer),
+					"jsonify": partial(self.jsonify),
+					"sendJson": partial(self.sendJson, dataRecv[1], dataRecv[2]),
+					"closeConnection": partial(self.closeConnection),
+					"updateDuty": partial(self.updateCurrentDuty, dataRecv[1]),
+					"isOnline": partial(self.isOnline)
+				}
+				returnData = interactionAccess[dataRecv[0]]()
+				# print(returnData)
+
+				logMessage = "Executing Pipe Command: " + str(dataRecv)
+				self.debugLogger.log("Debug", self.type + ': ' + logMessage)
+
+				pipe.send(returnData)
+
+	# |============================================================================|
+
+	def createProcess(self):
 		# ||=======================||
-		self.communicationThread = Thread(target = self.communicationModule, args=(comPipe,))
+		self.communicationThread = Thread(target = self.communicationModule)
 		self.communicationThread.setDaemon(True)
 		self.communicationThread.start()
 		
