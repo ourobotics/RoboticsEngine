@@ -52,10 +52,12 @@ class RoboticsEngine(object):
 		# ||=======================||
 		# Program Config Varaibles
 		self.useNetworkClient = True
+		self.useDataSyncController = True
 
 		# ||=======================||
 		# Program Classes
 		self.networkClient = NetworkClient()
+		self.dataSyncController = DataSyncController()
 
 		# ||=======================||
 		# Config <bool>
@@ -66,6 +68,7 @@ class RoboticsEngine(object):
 		# Defaults
 		self.debugLogger = DebugLogger(self.type)
 		self.debugLogger.setMessageSettings(
+			ast.literal_eval(self.config["Debug"]),
 			ast.literal_eval(self.config["Standard"]),
 			ast.literal_eval(self.config["Warning"]),
 			ast.literal_eval(self.config["Error"]))
@@ -146,13 +149,22 @@ class RoboticsEngine(object):
 			self.networkClientProcess = Process(target = self.networkClient.createProcess, args=(self.networkClientProcessCPipe,))
 			self.networkClientProcess.daemon = True
 			self.networkClientProcess.start()
+
+			if (self.useDataSyncController):
+				self.dataSyncController.initializeNetworkClientPipe(self.networkClientProcessPPipe)
+				
+				self.dataSyncControllerPPipe, self.dataSyncControllerCPipe = Pipe()
+				self.dataSyncControllerProcess = Process(target = self.dataSyncController.createProcess)
+				self.dataSyncControllerProcess.daemon = True
+				self.dataSyncControllerProcess.start()
+				
 		
 		
 		try:
 			while(1):
 				# logMessage = "Running"
 				# self.debugLogger.log("Standard", logMessage)
-				self.networkClientProcessPPipe.send(["jsonify"])
+				# self.networkClientProcessPPipe.send(["jsonify"])
 				# print(self.networkClientProcessPPipe.recv())
 				sleep(10)
 				# continue

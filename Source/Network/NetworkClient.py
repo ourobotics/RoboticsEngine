@@ -22,6 +22,8 @@ import traceback
 import pickle
 import ast
 from threading import Thread
+import sys
+from functools import partial
 # ||=======================||
 # Notes
 #
@@ -58,6 +60,7 @@ class NetworkClient:
 
 		self.debugLogger = DebugLogger(self.type)
 		self.debugLogger.setMessageSettings(
+			ast.literal_eval(self.config["Debug"]),
 			ast.literal_eval(self.config["Standard"]),
 			ast.literal_eval(self.config["Warning"]),
 			ast.literal_eval(self.config["Error"]))
@@ -84,6 +87,12 @@ class NetworkClient:
 	def loadConfig(self, configName):
 		configLoader = ConfigLoader()
 		config = configLoader.getConfig(configName)
+		
+		try:
+			logMessage = "Reloading Config"
+			self.debugLogger.log("Debug", self.type + ': ' + logMessage)
+		except Exception as e:
+			return config
 		return config
 
 	# |============================================================================|
@@ -154,22 +163,23 @@ class NetworkClient:
 	def communicationModule(self, comPipe):
 		while (1):
 			dataRecv = comPipe.recv() * 3
-
+			# print(dataRecv)
 			logMessage = "Reading From Pipe"
-			self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+			self.debugLogger.log("Debug", self.type + ': ' + logMessage)
 
 			interactionAccess = {
-				"pingServer": self.pingServer(),
-				"jsonify": self.jsonify(),
-				"reLoadConfig": self.loadConfig(self.type),
-				"sendJson": self.sendJson(dataRecv[1], dataRecv[2]),
-				"closeConnection": self.closeConnection(),
-				"updateDuty": self.updateCurrentDuty(dataRecv[1])
+				"pingServer": partial(self.pingServer),
+				"jsonify": partial(self.jsonify),
+				"reLoadConfig": partial(self.loadConfig, self.type),
+				"sendJson": partial(self.sendJson, dataRecv[1], dataRecv[2]),
+				"closeConnection": partial(self.closeConnection),
+				"updateDuty": partial(self.updateCurrentDuty, dataRecv[1]),
+				"isOnline": partial(self.isOnline)
 			}
-			returnData = interactionAccess[dataRecv[0]]
+			returnData = interactionAccess[dataRecv[0]]()
 
 			logMessage = "Executing Pipe Command"
-			self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+			self.debugLogger.log("Debug", self.type + ': ' + logMessage)
 
 			comPipe.send(returnData)
 
@@ -267,7 +277,7 @@ class NetworkClient:
 	def sendJson(self, code, json):
 		command = (code, pickle.dumps(json))
 		if (self.connectionStatus == True):
-			logMessage = "Sending Json Data: " + str(code)
+			logMessage = "Sending Json Data: " + str(code) + " " + str(json)
 			self.debugLogger.log("Standard", self.type + ': ' + logMessage)
 			try:
 				self.connectionHolder.send(str(command).encode())
@@ -296,13 +306,13 @@ class NetworkClient:
 				return self.jsonify(
 					"Connection Close",
 					str(strftime("%a;%d-%m-%Y;%H:%M:%S", localtime())), 
-					"sendJson"
+					"closeConnection"
 				)
 			except Exception as e:
 				return self.jsonify(
 					"Connection Closure - Fail",
 					str(strftime("%a;%d-%m-%Y;%H:%M:%S", localtime())), 
-					"sendJson"
+					"closeConnection"
 				)
 		return 0
 

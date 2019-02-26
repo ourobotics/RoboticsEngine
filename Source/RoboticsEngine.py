@@ -50,12 +50,9 @@ class RoboticsEngine(object):
 		# Program Classes
         self.networkClient = NetworkClient()
         self.dataSyncController = DataSyncController(self.networkClient)
-<<<<<<< HEAD
-=======
         self.energyController = EnergyController()
         self.thermoController = ThermoController()
         self.gpsController = GpsController()
->>>>>>> 44abefc05169eeb64e79ddb7ec2d5864befc5852
 
     def main(self):
         # ||=======================||

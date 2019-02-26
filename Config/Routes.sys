@@ -1,8 +1,8 @@
 ../Config/
 ./Controllers/
 ./Cache/
-./Server/
-./Server/Routes
+./Network/
+./Network/Routes
 ./Services/
 ./Tools/
 ./Test/
