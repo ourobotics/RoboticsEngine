@@ -100,8 +100,24 @@ class EngineDataController(object):
 
 	# |============================================================================|
 
+	def pipeNetworkClientData(self, data):
+		if (self.networkClientPipe != ""):
+			# data = ["isOnline"]
+			self.networkClientPipe.send(data)
+			returnData = "Empty"
+			for i in range(10):
+				if (self.networkClientPipe.poll(0.5)):
+					returnData = self.networkClientPipe.recv()
+					return returnData
+			if (returnData == "Empty"):
+				returnData = None
+				
+				logMessage = "Failed To Recieve Data From The networkClientPipe"
+				self.debugLogger.log("Error", self.type, logMessage)
+
+	# |============================================================================|
+
 	def pushChildPipe(self, pipe):
-		pipe.poll(0.5)
 		self.childPipes.append(pipe)	
 
 	# |============================================================================|
@@ -122,7 +138,7 @@ class EngineDataController(object):
 				# print(dataRecv)
 
 				logMessage = "Reading From Pipe"
-				self.debugLogger.log("Debug", self.type + ': ' + logMessage)
+				self.debugLogger.log("Debug", self.type, logMessage)
 
 				interactionAccess = {
 					"NetworkClientCache.getLiveData": partial(self.networkClientCache.getLiveData),
@@ -137,14 +153,14 @@ class EngineDataController(object):
 
 				if (denyCode == True):
 					logMessage = "Pipe Command Denied: " + str(dataRecv)
-					self.debugLogger.log("Error", self.type + ': ' + logMessage)
+					self.debugLogger.log("Error", self.type, logMessage)
 					comPipe.send("Denied")
 					return 0
 				else:
 					returnData = interactionAccess[dataRecv[0]]()
 
 					logMessage = "Executing Pipe Command: " + str(dataRecv)
-					self.debugLogger.log("Debug", self.type + ': ' + logMessage)
+					self.debugLogger.log("Debug", self.type, logMessage)
 
 					comPipe.send(returnData)
 					return 0
@@ -153,6 +169,9 @@ class EngineDataController(object):
 	# |============================================================================|
 
 	def createProcess(self):
+		logMessage = "Process Started"
+		self.debugLogger.log("Standard", self.type, logMessage)
+
 		self.networkClientCache = NetworkClientCache()
 
 		# ||=======================||
@@ -162,7 +181,7 @@ class EngineDataController(object):
 		self.communicationThread.start()
 
 		logMessage = "communicationThread Started"
-		self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+		self.debugLogger.log("Standard", self.type, logMessage)
 		
 		# ||=======================||
 
@@ -171,17 +190,17 @@ class EngineDataController(object):
 		self.syncEngineDataThread.start()
 
 		logMessage = "syncEngineDataThread Started"
-		self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+		self.debugLogger.log("Standard", self.type, logMessage)
 
 		try:
 			while(1):
 				# logMessage = "Running"
-				# self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+				# self.debugLogger.log("Standard", self.type, logMessage)
 				# sleep(10)
 				continue
 		except KeyboardInterrupt as e:
-			logMessage = "Joined"
-			self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+			logMessage = "Process Joined"
+			self.debugLogger.log("Standard", self.type, logMessage)
 			return 0
 		return 0
 
@@ -191,17 +210,17 @@ class EngineDataController(object):
 	def syncEngineData(self):
 		while (1):
 			if (self.useNetworkClientCache):
-				self.networkClientPipe.send(["jsonify"])
-				currentData = self.networkClientPipe.recv()
+				command = ["jsonify"]
+				currentData = self.pipeNetworkClientData(command)
 				self.networkClientCache.setLiveData(currentData)
 
 				logMessage = "NetworkClient Data Successfully Synced"
-				self.debugLogger.log("Debug", self.type + ': ' + logMessage)
+				self.debugLogger.log("Debug", self.type, logMessage)
 
 			sleep(1)
 
 
 			logMessage = "Engine Data Successfully Synced"
-			self.debugLogger.log("Debug", self.type + ': ' + logMessage)
+			self.debugLogger.log("Debug", self.type, logMessage)
 
 # |===============================================================|

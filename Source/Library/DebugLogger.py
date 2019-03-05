@@ -12,13 +12,11 @@
 # Premades
 from time import strftime, localtime
 import traceback
-# from time import gmtime, strftime
 # ||=======================||
 # Global Variables
 
 # ||=======================||
 # Notes
-# strftime("%a, %d %b %Y %H:%M:%S", localtime())
 # ||=======================||
 # |============================================================================|
 class DebugLogger(object):
@@ -77,9 +75,9 @@ class DebugLogger(object):
 		if (len(self.messageBuffer) > self.logSize):
 			self.dumpMessageBuffer()
 
-	def log(self, messageType, message, forcePrint = 0):
+	def log(self, messageType, _class, message, forcePrint = 0):
 		printBool = self.messageSettings[messageType]
-		updatedMessage = strftime("%d-%m-%Y | %H:%M:%S", localtime()) + " | " + messageType.ljust(8) + ' | ' + message
+		updatedMessage = strftime("%d-%m-%Y | %H:%M:%S", localtime()) + " | " + messageType.ljust(8) + ' | ' + _class.ljust(20) + ' | ' + message
 		self.addMessageBuffer(updatedMessage)
 		if (printBool or forcePrint):
 			print(updatedMessage)

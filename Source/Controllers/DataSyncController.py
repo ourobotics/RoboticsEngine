@@ -52,7 +52,7 @@ class DataSyncController:
 		# ||=======================||
 		# Communication Pipes
 		self.networkClientPipe = None
-		self.EngineDataControllerPipe = None
+		self.engineDataControllerPipe = None
 
 		# ||=======================||
 		# Config <bool>
@@ -77,65 +77,92 @@ class DataSyncController:
 
 	# |============================================================================|
 
-	def initializeEngineDataControllerPipe(self, pipe):
-		self.EngineDataControllerPipe = pipe
-		return 0
-
-
+	def pipeNetworkClientData(self, data):
+		if (self.networkClientPipe != ""):
+			# data = ["isOnline"]
+			self.networkClientPipe.send(data)
+			returnData = "Empty"
+			for i in range(10):
+				if (self.networkClientPipe.poll(0.5)):
+					returnData = self.networkClientPipe.recv()
+					return returnData
+			if (returnData == "Empty"):
+				returnData = None
+				
+				logMessage = "Failed To Recieve Data From The networkClientPipe"
+				self.debugLogger.log("Error", self.type, logMessage)
 
 	# |============================================================================|
 
-	def pipeData(self, data):
-		if (self.networkClientPipe != ""):
-			# ["isOnline"]
-			self.networkClientPipe.send(data)
-			returnData = self.networkClientPipe.recv()
-			return returnData
+	def initializeengineDataControllerPipe(self, pipe):
+		self.engineDataControllerPipe = pipe
+		return 0
+
+	# |============================================================================|
+
+	def pipeEngineDataControllerData(self, data):
+		if (self.engineDataControllerPipe != ""):
+			# data = ["isOnline"]
+			self.engineDataControllerPipe.send(data)
+			returnData = "Empty"
+			for i in range(10):
+				self.engineDataControllerPipe.poll(0.5)
+				returnData = self.engineDataControllerPipe.recv()
+				return returnData
+			if (returnData == "Empty"):
+				returnData = None
+
+				logMessage = "Failed To Recieve Data From The engineDataControllerPipe"
+				self.debugLogger.log("Error", self.type, logMessage)
 
 	# |============================================================================|
 
 	def createProcess(self):
-		# self.syncLiveData()
-		self.syncLiveDataThread = Thread(target = self.streamData)
+		logMessage = "Process Started"
+		self.debugLogger.log("Standard", self.type, logMessage)
+
+		# ||=======================||
+
+		self.syncLiveDataThread = Thread(target = self.syncLiveData)
 		self.syncLiveDataThread.setDaemon(True)
 		self.syncLiveDataThread.start()
 
 		logMessage = "syncLiveDataThread Started"
-		self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+		self.debugLogger.log("Standard", self.type, logMessage)
 
 		try:
 			while(1):
 				# logMessage = "Running"
-				# self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+				# self.debugLogger.log("Standard", self.type, logMessage)
 				# sleep(10)
 				continue
 		except KeyboardInterrupt as e:
-			logMessage = "Joined"
-			self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+			logMessage = "Process Joined"
+			self.debugLogger.log("Standard", self.type, logMessage)
 			return 0
 		return 0
 
 	# |============================================================================|
 
-	def streamData(self):
+	def syncLiveData(self):
 		while (1):
-			while (self.active):
-				# gpsControllerData = EngineData.GpsController.getLiveData()
-				# if (gpsControllerData != None):
-				# 	self.networkClient.sendJson("#40001", gpsControllerData)
-
-				# thermoControllerData = EngineData.ThermoController.getLiveData()
-				# if (thermoControllerData != None):
-				# 	self.networkClient.sendJson("#40005", thermoControllerData)
-
-				# energyControllerData = EngineData.EnergyController.getLiveData()
-				# if (energyControllerData != None):
-				# 	self.networkClient.sendJson("#40007", energyControllerData)
-				self.active = self.pipeData(onlineTest)
-
-				sleep(5)
 			onlineTest = ["isOnline"]
-			self.active = self.pipeData(onlineTest)
+			self.active = self.pipeNetworkClientData(onlineTest)
+			
+			while (self.active):
+			# 	# gpsControllerData = EngineData.GpsController.getLiveData()
+			# 	# if (gpsControllerData != None):
+			# 	# 	self.networkClient.sendJson("#40001", gpsControllerData)
+
+			# 	# thermoControllerData = EngineData.ThermoController.getLiveData()
+			# 	# if (thermoControllerData != None):
+			# 	# 	self.networkClient.sendJson("#40005", thermoControllerData)
+
+			# 	# energyControllerData = EngineData.EnergyController.getLiveData()
+			# 	# if (energyControllerData != None):
+			# 	# 	self.networkClient.sendJson("#40007", energyControllerData)
+				self.active = self.pipeNetworkClientData(onlineTest)
+				sleep(5)
 			sleep(5)
 
 # |============================================================================|

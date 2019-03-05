@@ -11,7 +11,7 @@
 # ||============================================================================||
 # ||=======================||
 # Routes
-from System.Routes import Routes
+from Library.RouteExtension import RouteExtension
 # Controllers
 from DataSyncController import DataSyncController
 from EngineDataController import EngineDataController
@@ -105,25 +105,27 @@ class RoboticsEngine(object):
 	def main(self):
 		# ||=======================||
 		# Pipes
-
 		# ||=======================||
 		# NetworkClient Pipes
 		# NetworkClient <-> DataSyncController Pipe
-		self.NCDSCppipe, self.NCDSCcpipe = Pipe()
-		# NetworkClient <-> NetworkClient Pipe
-		self.EDCNCppipe, self.EDCNCcpipe = Pipe()
+		self.NC_DSC_ppipe, self.NC_DSC_cpipe = Pipe()
+		# NetworkClient <-> EngineDataController Pipe
+		self.NC_EDC_ppipe, self.NC_EDC_cpipe = Pipe()
 		
 		# ||=======================||
 		# EngineDataController Pipes
 		# EngineDataController <-> DataSyncController Pipe
-		self.EDCDSCppipe, self.EDCDSCcpipe = Pipe()
+		self.EDC_DSC_ppipe, self.EDC_DSC_cpipe = Pipe()
 
 
 		# ||=======================||
 		# Program Setup
 		if (self.useNetworkClient):
-			self.networkClient.pushChildPipe(self.NCDSCcpipe)
-			self.networkClient.pushChildPipe(self.EDCNCcpipe)
+			# ||=======================||
+			# Parent Pipes
+			self.networkClient.pushChildPipe(self.NC_DSC_ppipe)
+			self.networkClient.pushChildPipe(self.NC_EDC_ppipe)
+			# ||=======================||
 
 			self.networkClientProcess = Process(target = self.networkClient.createProcess)
 			self.networkClientProcess.daemon = True
@@ -131,17 +133,24 @@ class RoboticsEngine(object):
 
 
 			if (self.useDataSyncController):
-				self.dataSyncController.initializeNetworkClientPipe(self.NCDSCppipe)
-				self.dataSyncController.initializeEngineDataControllerPipe(self.EDCDSCppipe)
+				# ||=======================||
+				# Child Pipes
+				self.dataSyncController.initializeNetworkClientPipe(self.NC_DSC_cpipe)
+				self.dataSyncController.initializeengineDataControllerPipe(self.EDC_DSC_cpipe)
+				# ||=======================||
 				
 				self.dataSyncControllerProcess = Process(target = self.dataSyncController.createProcess)
 				self.dataSyncControllerProcess.daemon = True
 				self.dataSyncControllerProcess.start()
 				
 		if (self.useEngineDataController):
-			self.engineDataController.pushChildPipe(self.EDCDSCcpipe)
-
-			self.engineDataController.initializeNetworkClientPipe(self.EDCNCppipe)
+			# ||=======================||
+			# Parent Pipes
+			self.engineDataController.pushChildPipe(self.EDC_DSC_ppipe)
+			# ||=======================||
+			# Child Pipes
+			self.engineDataController.initializeNetworkClientPipe(self.NC_EDC_cpipe)
+			# ||=======================||
 
 			self.engineDataControllerProcess = Process(target = self.engineDataController.createProcess)
 			self.engineDataControllerProcess.daemon = True
@@ -158,9 +167,8 @@ class RoboticsEngine(object):
 				# continue
 		except KeyboardInterrupt as e:
 			if (self.useNetworkClient):
-				# self.networkClient.closeConnection()
-				logMessage = "Joined"
-				self.debugLogger.log("Standard", self.type + ': ' + logMessage)
+				logMessage = "Process Joined"
+				self.debugLogger.log("Standard", self.type, logMessage)
 				self.networkClientProcess.join()
 			return
 
