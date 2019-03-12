@@ -9,10 +9,12 @@
 # ||  Last Date:        5 March 2018 | Logan Wilkovich
 # ||=======================================================================||
 # ||=======================||
-# Tools
+# Library
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
+# Library/Network
 from NetworkClient import NetworkClient
+# Library/Controllers
 from ControllerDataSync import ControllerDataSync
 # Import Modules
 from time import sleep, time, strftime, localtime

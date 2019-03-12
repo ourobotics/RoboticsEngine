@@ -9,16 +9,12 @@
 # ||  Creation Date:	11 March 2018 | Logan Wilkovich
 # ||=======================================================================||
 # ||=======================||
-# Routes
-# Server
-# Services
-# Controllers
-from EngineDataController import EngineDataController
-# Tools
+# Library
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
-# Test
-# Data
+# Library/Controllers
+from EngineDataController import EngineDataController
+# Library/Cache
 from NetworkClientCache import NetworkClientCache
 # Premades
 from time import sleep, time, strftime, localtime

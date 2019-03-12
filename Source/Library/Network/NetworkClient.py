@@ -9,9 +9,10 @@
 # ||  Last Date:        21 November 2018 | Logan Wilkovich
 # ||=======================================================================||
 # ||=======================||
-# Tools
+# Library
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
+# Library/Controllers
 from ControllerDataSync import ControllerDataSync 
 # Import Modules
 from time import sleep, time, strftime, localtime

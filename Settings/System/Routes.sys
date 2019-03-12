@@ -3,7 +3,7 @@
 ./Library/Controllers/
 ./Library/
 ./Library/Modules/
-./Network/
+./Library/Network/
 ./System/
 ./Test/
 ./Tools/

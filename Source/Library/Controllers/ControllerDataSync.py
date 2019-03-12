@@ -9,15 +9,9 @@
 # ||  Creation Date:    27 December 2018 | Logan Wilkovich
 # ||=======================================================================||
 # ||=======================||
-# Routes
-# Server
-# Services
-# Controllers
-# Tools
+# Library
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
-# Test
-# Data
 # Premades
 from time import sleep, time, strftime, localtime
 from threading import Thread

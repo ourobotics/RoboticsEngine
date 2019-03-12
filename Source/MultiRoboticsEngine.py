@@ -11,12 +11,11 @@
 # ||=======================||
 # Routes
 from Library.RouteExtension import RouteExtension
-# Server
-from NetworkClientModule import NetworkClientModule
 # Library
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
 # Library/Modules
+from NetworkClientModule import NetworkClientModule
 from EngineDataModule import EngineDataModule
 # Premades
 from multiprocessing import Process, Pipe

@@ -9,7 +9,7 @@
 # ||  Creation Date:	24 December 2018 | Logan Wilkovich
 # ||=======================================================================||
 # ||=======================||
-# Tools
+# Library
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
 # Data

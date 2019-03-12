@@ -9,14 +9,6 @@
 # ||  Creation Date:	23 July 2018 | Logan Wilkovich
 # ||=======================================================================||
 # ||=======================||
-# Routes
-
-# Controllers
-
-# Tools
-# from LoggingTool import LoggingTool
-# Test
-
 # Premades
 from time import strftime, localtime
 import traceback
