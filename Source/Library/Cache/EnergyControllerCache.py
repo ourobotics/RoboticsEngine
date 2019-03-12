@@ -1,14 +1,13 @@
 # ||==============================================================||
 # ||
-# ||  Program/File:     MechnicalControllerCache.py
+# ||  Program/File:     EnergyControllerCache.py
 # ||
 # ||  Description:      
 # ||
 # ||  Author:           Logan Wilkovich
 # ||  Email:            LWilkovich@gmail.com
 # ||  Creation Date:    27 December 2018 | Logan Wilkovich
-# ||===============================================================||
-# ||===============================================================||
+# ||=======================================================================||
 # ||=======================||
 # Routes
 # Server
@@ -26,11 +25,12 @@ from time import sleep, time, strftime, localtime
 # ||=======================||
 # Notes
 # ||=======================||
-# ||===============================================================||
+# ||=======================================================================||
 
-class MechnicalControllerCache:
-	def __init__(self):
-        self.type = "MechnicalControllerCache"
+class EnergyControllerCache(object):
+
+    def __init__(self):
+        self.type = "EnergyControllerCache"
 
         # self.active = False
 
@@ -54,28 +54,28 @@ class MechnicalControllerCache:
         # ||=======================||
         # Defaults
         self.duty = "Inactive"
-		self.controllerCache = {
-			"LiveData": None,
-			"InternalLog": []
-		}
+        self.controllerCache = {
+            "LiveData": None,
+            "InternalLog": []
+        }
 
-	# ||=======================||
-	# LiveData Helpers
-	def getLiveData(self):
-		return self.controllerCache["LiveData"]
+    # ||=======================||
+    # LiveData Helpers
+    def getLiveData(self):
+        return self.controllerCache["LiveData"]
 
-	def setLiveData(self, type, data):
-		self.controllerCache["LiveData"] = data
+    def setLiveData(self, data):
+        self.controllerCache["LiveData"] = data
 
-	# ||=======================||
-	# InteralLog Helpers
-	def pushInternalLog(self, data):
-		self.controllerCache["InternalLog"].append(data)
+    # ||=======================||
+    # InteralLog Helpers
+    def pushInternalLog(self, data):
+        self.controllerCache["InternalLog"].append(data)
 
-	def getInternalLog(self, i):
-		if (i == None):
-			return self.controllerCache["InternalLog"]
-		else:
-			return self.controllerCache["InternalLog"][int(i)]
+    def getInternalLog(self, i = None):
+        if (i == None):
+            return self.controllerCache["InternalLog"]
+        else:
+            return self.controllerCache["InternalLog"][int(i)]
 
-# ||===============================================================||
+# ||=======================================================================||

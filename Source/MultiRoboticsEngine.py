@@ -1,33 +1,25 @@
-# ||===============================================================||
+# ||=======================================================================||
 # ||
-# ||  Program/File:     RoboticsEngine.py
+# ||  Program/File:     MultiRoboticsEngine.py
 # ||
 # ||  Description:		
 # ||
 # ||  Author:           Logan Wilkovich
 # ||  Email:            LWilkovich@gmail.com
 # ||  Creation Date:    21 November 2018 | Logan Wilkovich
-# ||===============================================================||
-# ||============================================================================||
+# ||=======================================================================||
 # ||=======================||
 # Routes
 from Library.RouteExtension import RouteExtension
-# Controllers
-from DataSyncController import DataSyncController
-from EngineDataController import EngineDataController
-from GpsController import GpsController
-from ThermoController import ThermoController
-from EnergyController import EnergyController
 # Server
-from NetworkClient import NetworkClient
-# Tools
+from NetworkClientModule import NetworkClientModule
+# Library
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
-# Test
-# Cache
+# Library/Modules
+from EngineDataModule import EngineDataModule
 # Premades
 from multiprocessing import Process, Pipe
-from threading import Thread
 from time import sleep, time, strftime, localtime
 import traceback
 import os
@@ -39,7 +31,7 @@ import ast
 # Notes
 
 # ||=======================||
-# ||============================================================================||
+# ||=======================================================================||
 
 class RoboticsEngine(object):
 	def __init__(self):
@@ -50,14 +42,13 @@ class RoboticsEngine(object):
 		# ||=======================||
 		# Program Config Varaibles
 		self.useNetworkClient = True
-		self.useDataSyncController = True
+		self.useControllerDataSync = True
 		self.useEngineDataController = True
 
 		# ||=======================||
 		# Program Classes
-		self.networkClient = NetworkClient()
-		self.dataSyncController = DataSyncController()
-		self.engineDataController = EngineDataController()
+		self.networkClientModule = NetworkClientModule()
+		self.engineDataModule = EngineDataModule()
 
 		configLoader = ConfigLoader()
 		self.config = configLoader.getConfig(self.type)
@@ -77,13 +68,13 @@ class RoboticsEngine(object):
 		# ||=======================||
 		# Defaults
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def updateCurrentDuty(self, duty):
 		self.duty = duty
 		return 0
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def jsonify(self, message = "Null", time = -1, function = "jsonify"):
 		return {
@@ -100,21 +91,21 @@ class RoboticsEngine(object):
 			}
 		}
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def main(self):
 		# ||=======================||
 		# Pipes
 		# ||=======================||
 		# NetworkClient Pipes
-		# NetworkClient <-> DataSyncController Pipe
+		# NetworkClient <-> ControllerDataSync Pipe
 		self.NC_DSC_ppipe, self.NC_DSC_cpipe = Pipe()
 		# NetworkClient <-> EngineDataController Pipe
 		self.NC_EDC_ppipe, self.NC_EDC_cpipe = Pipe()
 		
 		# ||=======================||
 		# EngineDataController Pipes
-		# EngineDataController <-> DataSyncController Pipe
+		# EngineDataController <-> ControllerDataSync Pipe
 		self.EDC_DSC_ppipe, self.EDC_DSC_cpipe = Pipe()
 
 
@@ -123,36 +114,26 @@ class RoboticsEngine(object):
 		if (self.useNetworkClient):
 			# ||=======================||
 			# Parent Pipes
-			self.networkClient.pushChildPipe(self.NC_DSC_ppipe)
-			self.networkClient.pushChildPipe(self.NC_EDC_ppipe)
+			self.networkClientModule.networkClient.pushParentPipe(self.NC_DSC_ppipe)
+			self.networkClientModule.networkClient.pushParentPipe(self.NC_EDC_ppipe)
 			# ||=======================||
+			# Child Pipes
+			self.networkClientModule.controllerDataSync.pushChildPipe("EngineDataController", self.EDC_DSC_cpipe)
 
-			self.networkClientProcess = Process(target = self.networkClient.createProcess)
+			self.networkClientProcess = Process(target = self.networkClientModule.createProcess)
 			self.networkClientProcess.daemon = True
 			self.networkClientProcess.start()
-
-
-			if (self.useDataSyncController):
-				# ||=======================||
-				# Child Pipes
-				self.dataSyncController.initializeNetworkClientPipe(self.NC_DSC_cpipe)
-				self.dataSyncController.initializeengineDataControllerPipe(self.EDC_DSC_cpipe)
-				# ||=======================||
-				
-				self.dataSyncControllerProcess = Process(target = self.dataSyncController.createProcess)
-				self.dataSyncControllerProcess.daemon = True
-				self.dataSyncControllerProcess.start()
 				
 		if (self.useEngineDataController):
 			# ||=======================||
 			# Parent Pipes
-			self.engineDataController.pushChildPipe(self.EDC_DSC_ppipe)
+			self.engineDataModule.engineDataController.pushParentPipe(self.EDC_DSC_ppipe)
 			# ||=======================||
 			# Child Pipes
-			self.engineDataController.initializeNetworkClientPipe(self.NC_EDC_cpipe)
+			self.engineDataModule.engineDataController.pushChildPipe("NetworkClient",  self.NC_EDC_cpipe)
 			# ||=======================||
 
-			self.engineDataControllerProcess = Process(target = self.engineDataController.createProcess)
+			self.engineDataControllerProcess = Process(target = self.engineDataModule.createProcess)
 			self.engineDataControllerProcess.daemon = True
 			self.engineDataControllerProcess.start()
 		
@@ -172,10 +153,10 @@ class RoboticsEngine(object):
 				self.networkClientProcess.join()
 			return
 
-	# |============================================================================|
+# ||=======================================================================||
 
 if __name__ == '__main__':
 	re = RoboticsEngine()
 	re.main()
 
-# |============================================================================|
+# ||=======================================================================||

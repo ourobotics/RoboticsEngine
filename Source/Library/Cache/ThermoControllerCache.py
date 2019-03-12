@@ -1,14 +1,13 @@
 # ||==============================================================||
 # ||
-# ||  Program/File:     GpsControllerCache.py
+# ||  Program/File:     ThermoControllerCache.py
 # ||
 # ||  Description:      
 # ||
 # ||  Author:           Logan Wilkovich
 # ||  Email:            LWilkovich@gmail.com
 # ||  Creation Date:    27 December 2018 | Logan Wilkovich
-# ||===============================================================||
-# ||===============================================================||
+# ||=======================================================================||
 # ||=======================||
 # Routes
 # Server
@@ -26,11 +25,11 @@ from time import sleep, time, strftime, localtime
 # ||=======================||
 # Notes
 # ||=======================||
-# ||===============================================================||
+# ||=======================================================================||
 
-class GpsControllerCache:
+class ThermoControllerCache(object):
     def __init__(self):
-        self.type = "EnergyControllerCache"
+        self.type = "ThermoControllerCache"
 
         # self.active = False
 
@@ -59,21 +58,23 @@ class GpsControllerCache:
             "InternalLog": []
         }
 
-    # ||=======================||
-    # LiveData Helpers
-    def getLiveData(self):
-        return self.controllerCache["LiveData"]
+        # ||=======================||
+        # LiveData Helpers
+        def getLiveData(self):
+            return self.controllerCache["LiveData"]
 
-    def setLiveData(self, data):
-        self.GpsConcontrollerCachetroller["LiveData"] = data
+        def setLiveData(self, data):
+            self.controllerCache["LiveData"] = data
 
-    # ||=======================||
-    # InteralLog Helpers
-    def pushInternalLog(self, data):
-        self.controllerCache["InternalLog"].append(data)
+        # ||=======================||
+        # InteralLog Helpers
+        def pushInternalLog(self, data):
+            self.controllerCache["InternalLog"].append(data)
 
-    def getInternalLog(self, i):
-        if (i == None):
-            return self.controllerCache["InternalLog"]
-        else:
-            return self.controllerCache["InternalLog"][int(i)]
+        def getInternalLog(self, i):
+            if (i == None):
+                return self.controllerCache["InternalLog"]
+            else:
+                return self.controllerCache["InternalLog"][int(i)]
+
+# ||=======================================================================||

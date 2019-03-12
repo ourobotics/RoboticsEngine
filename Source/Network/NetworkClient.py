@@ -1,4 +1,4 @@
-# ||===============================================================||
+# ||=======================================================================||
 # ||
 # ||  File:          	NetworkClient.py
 # ||
@@ -7,11 +7,12 @@
 # ||  Author:           Logan Wilkovich
 # ||  Email:            LWilkovich@gmail.com
 # ||  Last Date:        21 November 2018 | Logan Wilkovich
-# ||===============================================================||
+# ||=======================================================================||
 # ||=======================||
 # Tools
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
+from ControllerDataSync import ControllerDataSync 
 # Import Modules
 from time import sleep, time, strftime, localtime
 from socket import timeout
@@ -67,15 +68,19 @@ class NetworkClient:
 		self.connectionStatus = False
 		self.connectionHolder = socket.socket()
 		self.socketTimeout = 1
-		self.childPipes = []
+		self.parentPipes = []
 
-	# |============================================================================|
+		# ||=======================||
+		# Inheritance
+		
+
+# ||=======================================================================||
 
 	def updateCurrentDuty(self, duty):
 		self.duty = duty
 		return 0
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def jsonify(self, message = "Null", time = strftime("%a;%d-%m-%Y;%H:%M:%S", localtime()), function = "jsonify"):
 		return {
@@ -97,20 +102,20 @@ class NetworkClient:
 			}
 		}
 
-	# |============================================================================|
+# ||=======================================================================||
 
-	def pushChildPipe(self, pipe):
-		self.childPipes.append(pipe)	
+	def pushParentPipe(self, pipe):
+		self.parentPipes.append(pipe)	
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def communicationModule(self):
 		while (1):
-			if (len(self.childPipes) != 0):
+			if (len(self.parentPipes) != 0):
 				dataRecv = None
 				while (dataRecv == None):
-					for i in range(len(self.childPipes)):
-						pipe = self.childPipes[i]
+					for i in range(len(self.parentPipes)):
+						pipe = self.parentPipes[i]
 						# print("Pipe:",i)
 						try:
 							if (pipe.poll(0.5)):
@@ -138,41 +143,7 @@ class NetworkClient:
 
 				pipe.send(returnData)
 
-	# |============================================================================|
-
-	def createProcess(self):
-		logMessage = "Process Started"
-		self.debugLogger.log("Standard", self.type, logMessage)
-
-		# ||=======================||
-		self.communicationThread = Thread(target = self.communicationModule)
-		self.communicationThread.setDaemon(True)
-		self.communicationThread.start()
-		
-		logMessage = "communicationThread Started"
-		self.debugLogger.log("Standard", self.type, logMessage)
-
-		# ||=======================||
-		self.connectionThread = Thread(target = self.establishConnection)
-		self.connectionThread.setDaemon(True)
-		self.connectionThread.start()
-
-		logMessage = "connectionThread Started"
-		self.debugLogger.log("Standard", self.type, logMessage)
-		
-		try:
-			while (1):
-				# logMessage = "Running"
-				# self.debugLogger.log("Standard", self.type, logMessage)
-				# sleep(10)
-				continue
-		except KeyboardInterrupt as e:
-			logMessage = "Process Joined"
-			self.debugLogger.log("Standard", self.type, logMessage)
-			return 0
-		return 0
-
-	# |============================================================================|
+# ||=======================================================================||
 
 	def establishConnection(self):
 		self.active = True
@@ -196,9 +167,10 @@ class NetworkClient:
 			except Exception as e:
 				logMessage = "Attempting To Establish Connection"
 				self.debugLogger.log("Warning", self.type, logMessage)
+				sleep(5)
 		return 0
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def pingServer(self):
 		command = ("#00001", "Requesting Connection Time Test")
@@ -222,7 +194,7 @@ class NetworkClient:
 				)
 		return 0
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def isOnline(self):
 		if ((self.connectionStatus == True) and (self.active == True)):
@@ -230,7 +202,7 @@ class NetworkClient:
 		else:
 			return False
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def sendJson(self, code, json):
 		command = (code, pickle.dumps(json))
@@ -247,7 +219,7 @@ class NetworkClient:
 				)
 		return 0
 
-	# |============================================================================|
+# ||=======================================================================||
 
 	def closeConnection(self):
 		WATCH = time()
@@ -274,4 +246,4 @@ class NetworkClient:
 				)
 		return 0
 
-# |===============================================================|
+# ||=======================================================================||

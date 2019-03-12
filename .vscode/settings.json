@@ -3,6 +3,7 @@
     // "python.linting.wrong-import-position": false,
     "python.linting.pylintEnabled": false,
     "files.exclude": {
-        "**/__pycache__": true
+        "**/__pycache__": true,
+        "**/*.pyc": true
     }
 }

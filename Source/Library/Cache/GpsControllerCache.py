@@ -1,14 +1,13 @@
 # ||==============================================================||
 # ||
-# ||  Program/File:     EnergyControllerCache.py
+# ||  Program/File:     GpsControllerCache.py
 # ||
 # ||  Description:      
 # ||
 # ||  Author:           Logan Wilkovich
 # ||  Email:            LWilkovich@gmail.com
 # ||  Creation Date:    27 December 2018 | Logan Wilkovich
-# ||===============================================================||
-# ||===============================================================||
+# ||=======================================================================||
 # ||=======================||
 # Routes
 # Server
@@ -26,10 +25,9 @@ from time import sleep, time, strftime, localtime
 # ||=======================||
 # Notes
 # ||=======================||
-# ||===============================================================||
+# ||=======================================================================||
 
-class EnergyControllerCache(object):
-
+class GpsControllerCache:
     def __init__(self):
         self.type = "EnergyControllerCache"
 
@@ -66,17 +64,15 @@ class EnergyControllerCache(object):
         return self.controllerCache["LiveData"]
 
     def setLiveData(self, data):
-        self.controllerCache["LiveData"] = data
+        self.GpsConcontrollerCachetroller["LiveData"] = data
 
     # ||=======================||
     # InteralLog Helpers
     def pushInternalLog(self, data):
         self.controllerCache["InternalLog"].append(data)
 
-    def getInternalLog(self, i = None):
+    def getInternalLog(self, i):
         if (i == None):
             return self.controllerCache["InternalLog"]
         else:
             return self.controllerCache["InternalLog"][int(i)]
-
-# |===============================================================|
