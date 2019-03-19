@@ -6,7 +6,7 @@
 # ||
 # ||  Author:           Logan Wilkovich
 # ||  Email:            LWilkovich@gmail.com
-# ||  Last Date:        5 March 2018 | Logan Wilkovich
+# ||  Creation Date:	5 March 2018 | Logan Wilkovich
 # ||=======================================================================||
 # ||=======================||
 # Library
@@ -28,9 +28,11 @@ import traceback
 import pickle
 import ast
 import sys
+import psutil
+import os
 # ||=======================||
 # Notes
-#
+process = psutil.Process(os.getpid())
 # ||=======================||
 # Global Variables
 
@@ -39,7 +41,7 @@ import sys
 
 class NetworkClientModule(NetworkClient):
 	def __init__(self):
-		self.type = "NetworkClient"
+		self.type = "NetworkClientModule"
 
 		# ||=======================||
 		# Program Classes
@@ -59,6 +61,11 @@ class NetworkClientModule(NetworkClient):
 			ast.literal_eval(self.config["Standard"]),
 			ast.literal_eval(self.config["Warning"]),
 			ast.literal_eval(self.config["Error"]))
+
+# ||=======================================================================||
+
+	def updateProcessMemorySize(self):
+		self.processMemorySize = int(int(process.memory_info().rss) / 1000000)
 
 # ||=======================================================================||
 
@@ -95,11 +102,12 @@ class NetworkClientModule(NetworkClient):
 		
 		try:
 			while (1):
-				# logMessage = "Running"
-				# self.debugLogger.log("Standard", self.type, logMessage)
-				# sleep(10)
-				continue
+				self.updateProcessMemorySize()
+				logMessage = "Current Size In Megabytes: " + str(self.processMemorySize)
+				self.debugLogger.log("Debug", self.type, logMessage)
+				sleep(10)
 		except KeyboardInterrupt as e:
+			print('\r', end='')
 			logMessage = "Process Joined"
 			self.debugLogger.log("Standard", self.type, logMessage)
 			return 0

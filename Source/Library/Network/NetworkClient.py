@@ -6,7 +6,7 @@
 # ||
 # ||  Author:           Logan Wilkovich
 # ||  Email:            LWilkovich@gmail.com
-# ||  Last Date:        21 November 2018 | Logan Wilkovich
+# ||  Creation Date:        21 November 2018 | Logan Wilkovich
 # ||=======================================================================||
 # ||=======================||
 # Library
@@ -89,10 +89,15 @@ class NetworkClient:
 				"_Class": self.type,
 				"_Function": function,
 				"Duty": self.duty,
-				"Return Status": True,
 				"Activity": self.active,
 				"Message": message,
-				"Time": time
+				"Time": time,
+				"Debug Logger": {
+					"Debug": self.config["Debug"],
+					"Standard": self.config["Standard"],
+					"Warning": self.config["Warning"],
+					"Error": self.config["Error"]
+				}
 			},
 			"Specific Information": {
 				"Host": self.host,

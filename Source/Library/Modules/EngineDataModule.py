@@ -15,15 +15,17 @@ from DebugLogger import DebugLogger
 # Library/Controllers
 from EngineDataController import EngineDataController
 # Library/Cache
-from NetworkClientCache import NetworkClientCache
 # Premades
 from time import sleep, time, strftime, localtime
 from threading import Thread
 import traceback
 import ast
+import sys
+import psutil
+import os
 # ||=======================||
 # Global Variables
-
+process = psutil.Process(os.getpid())
 # ||=======================||
 # Notes
 
@@ -54,6 +56,11 @@ class EngineDataModule():
 
 # ||=======================================================================||
 
+	def updateProcessMemorySize(self):
+		self.processMemorySize = int(int(process.memory_info().rss) / 1000000)
+
+# ||=======================================================================||
+
 	def createProcess(self):
 		logMessage = "Process Started"
 		self.debugLogger.log("Standard", self.type, logMessage)
@@ -78,12 +85,15 @@ class EngineDataModule():
 
 		try:
 			while(1):
-				# logMessage = "Running"
-				# self.debugLogger.log("Standard", self.type, logMessage)
-				# sleep(10)
-				continue
+				self.updateProcessMemorySize()
+				logMessage = "Current Size In Megabytes: " + str(self.processMemorySize)
+				self.debugLogger.log("Debug", self.type, logMessage)
+				sleep(10)
 		except KeyboardInterrupt as e:
+			print('\r', end='')
 			logMessage = "Process Joined"
 			self.debugLogger.log("Standard", self.type, logMessage)
 			return 0
 		return 0
+
+# ||=======================================================================||

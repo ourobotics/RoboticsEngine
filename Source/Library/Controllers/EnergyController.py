@@ -61,16 +61,21 @@ class EnergyController:
 
 # ||=======================================================================||
 
-	def jsonify(self, message = "Null", time = -1, function = "jsonify"):
+	def jsonify(self, message = "Null", time = strftime("%a;%d-%m-%Y;%H:%M:%S", localtime()), function = "jsonify"):
 		return {
 			"Generic Information": {
 				"_Class": self.type,
 				"_Function": function,
 				"Duty": self.duty,
-				"Return Status": True,
 				"Activity": self.active,
 				"Message": message,
-				"Time": time
+				"Time": time,
+				"Debug Logger": {
+					"Debug": self.config["Debug"],
+					"Standard": self.config["Standard"],
+					"Warning": self.config["Warning"],
+					"Error": self.config["Error"]
+				}
 			},
 			"Specific Information": {
 				"Energy": self.energy,

@@ -13,7 +13,8 @@
 from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
 # Data
-from NetworkClientCache import NetworkClientCache
+# from NetworkClientCache import NetworkClientCache
+from CacheModule import CacheModule
 # Premades
 from time import sleep, time, strftime, localtime
 from threading import Thread
@@ -37,7 +38,11 @@ class EngineDataController(object):
 
 		# ||=======================||
 		# Data Storage Types
-		self.networkClientCache = NetworkClientCache()
+		self.dataStorage = {
+			"NetworkClient": CacheModule(),
+			"RoboticsEngine": CacheModule()
+		}
+		# self.networkClientCache = NetworkClientCache()
 		
 		# ||=======================||
 		# Program Classes
@@ -60,7 +65,8 @@ class EngineDataController(object):
 		self.debug = self.config["Debug"]
 		self.log = self.config["Log"]
 		self.useCache = {
-			"NetworkClient": self.config["useNetworkClientCache"]
+			"NetworkClient": self.config["useNetworkClientCache"],
+			"RoboticsEngine": self.config["useRoboticsEngineCache"]
 		}
 
 		# ||=======================||
@@ -82,10 +88,15 @@ class EngineDataController(object):
 				"_Class": self.type,
 				"_Function": function,
 				"Duty": self.duty,
-				"Return Status": True,
 				"Activity": self.active,
 				"Message": message,
-				"Time": time
+				"Time": time,
+				"Debug Logger": {
+					"Debug": self.config["Debug"],
+					"Standard": self.config["Standard"],
+					"Warning": self.config["Warning"],
+					"Error": self.config["Error"]
+				}
 			},
 			"Specific Information": {
 				"Debug": self.debug
@@ -139,17 +150,19 @@ class EngineDataController(object):
 				self.debugLogger.log("Debug", self.type, logMessage)
 
 				interactionAccess = {
-					"NetworkClient.getLiveData": partial(self.networkClientCache.getLiveData),
-					"NetworkClient.setLiveData": partial(self.networkClientCache.setLiveData, dataRecv[1]),
-					"NetworkClient.getInternalLog": partial(self.networkClientCache.getInternalLog, dataRecv[1]),
-					"NetworkClient.pushInternalLog": partial(self.networkClientCache.pushInternalLog, dataRecv[1])
+					"NetworkClient.getLiveData": partial(self.dataStorage["NetworkClient"].getLiveData),
+					"NetworkClient.setLiveData": partial(self.dataStorage["NetworkClient"].setLiveData, dataRecv[1]),
+					"NetworkClient.getInternalLog": partial(self.dataStorage["NetworkClient"].getInternalLog, dataRecv[1]),
+					"NetworkClient.pushInternalLog": partial(self.dataStorage["NetworkClient"].pushInternalLog, dataRecv[1]),
+					"RoboticsEngine.getLiveData": partial(self.dataStorage["RoboticsEngine"].getLiveData),
+					"RoboticsEngine.setLiveData": partial(self.dataStorage["RoboticsEngine"].setLiveData, dataRecv[1]),
+					"RoboticsEngine.getInternalLog": partial(self.dataStorage["RoboticsEngine"].getInternalLog, dataRecv[1]),
+					"RoboticsEngine.pushInternalLog": partial(self.dataStorage["RoboticsEngine"].pushInternalLog, dataRecv[1])
 				}
-				denyCode = False
-				if (dataRecv[0].find("NetworkClientCache") != -1):
-					if (self.useNetworkClientCache == False):
-						denyCode = True
+				tempSplit = dataRecv[0].split('.')
+				toUse = self.useCache[tempSplit]
 
-				if (denyCode == True):
+				if (toUse == False):
 					logMessage = "Pipe Command Denied: " + str(dataRecv)
 					self.debugLogger.log("Error", self.type, logMessage)
 					comPipe.send("Denied")
@@ -173,10 +186,10 @@ class EngineDataController(object):
 				if (self.useCache[curPipe[0]]):
 					command = ["jsonify"]
 					currentData = self.pipeCommand(command, curPipe[1])
-					self.networkClientCache.setLiveData(currentData)
+					self.dataStorage[curPipe[0]].setLiveData(currentData)
 
-					logMessage = curPipe[0] + " Data Successfully Synced"
-					self.debugLogger.log("Standard", self.type, logMessage)
+				logMessage = curPipe[0] + " Data Successfully Synced"
+				self.debugLogger.log("Debug", self.type, logMessage)
 
 			sleep(1)
 
