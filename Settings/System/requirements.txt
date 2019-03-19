@@ -1,0 +1,2 @@
+psutil==5.6.1
+paramiko==2.4.2

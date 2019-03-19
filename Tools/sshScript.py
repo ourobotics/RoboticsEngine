@@ -1,6 +1,6 @@
 # ||=======================================================================||
 # ||
-# ||  Program/File:     sshScript.py
+# ||  Program/File:     SshScript.py
 # ||
 # ||  Description:		
 # ||
