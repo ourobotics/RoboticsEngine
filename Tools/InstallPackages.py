@@ -16,7 +16,10 @@ import subprocess
 
 # ||=======================||
 # Notes
-
+# python3 -m pip search <package>
+# python3 -m pip install -r <path>
+# sudo apt-cache policy <package>
+# sudo apt-get install <package>=<version>
 # ||=======================||
 # ||=======================================================================||
 
@@ -24,7 +27,14 @@ def executeCommand(command):
     print (" >> ",command)
     subprocess.run(command.split())
 
-command = "python -m pip install -r ../Settings/System/requirements.txt"
+command = "python3 -m pip install -r ../Settings/System/Requirements.txt"
 executeCommand(command)
+
+file = open("../Settings/System/PackageList.package", 'r')
+packages = file.readlines()
+for i in range(len(packages)):
+    command = "sudo apt-get install " + packages[i]
+    executeCommand(command)
+
 
 print(" >> ", "Done")
