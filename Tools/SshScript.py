@@ -11,6 +11,7 @@
 # ||=======================||
 # /Library/Utils/
 from Library.Utils.SshClient import SshClient
+import subprocess
 # ||=======================||
 # Global Variables
 
@@ -20,20 +21,25 @@ from Library.Utils.SshClient import SshClient
 # ||=======================||
 # ||=======================================================================||
 
-hostname = "odd01.cs.ohio.edu"
-username = "lwilkovi"
-password = "Bellaeisle1!"
+hostname = "192.168.0.20"
+username = "pi"
+password = "roverpassword1"
+location = "/home/pi/Workspace/"
 
 sshClient = SshClient(hostname=hostname, username=username, password=password)
 
 command1 = "git clone https://github.com/lwilkovich/RoboticsEngine"
-command2 = "rm -rf RoboticsEngine"
-command3 = "ps"
+command2 = "rm -rf " + location + "RoboticsEngine"
+command3 = "ls " + location
+command4 = "mkdir " + location + "RoboticsEngine"
+command5 = "scp -r ../../RoboticsEngine pi@192.168.0.20:/home/pi/Workspace/".split()
 
+# sshClient.executeCommand(command1)
+sshClient.executeCommand(command2)
+subprocess.call(command5)
 sshClient.executeCommand(command3)
-# sshClient.executeCommand(command2)
-# sshClient.executeCommand(command1)
-# sshClient.executeCommand(command2)
-# sshClient.executeCommand(command1)
+# sshClient.executeCommand(command4)
+# sshClient.executeCommand(command5)
+
 
 sshClient.closeClient()

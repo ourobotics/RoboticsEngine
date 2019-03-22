@@ -20,6 +20,7 @@ import subprocess
 # python3 -m pip install -r <path>
 # sudo apt-cache policy <package>
 # sudo apt-get install <package>=<version>
+# pip freeze | xargs pip uninstall -y
 # ||=======================||
 # ||=======================================================================||
 
@@ -27,14 +28,16 @@ def executeCommand(command):
     print (" >> ",command)
     subprocess.run(command.split())
 
-command = "python3 -m pip install -r ../Settings/System/Requirements.txt"
-executeCommand(command)
 
 file = open("../Settings/System/PackageList.package", 'r')
 packages = file.readlines()
 for i in range(len(packages)):
     command = "sudo apt-get install " + packages[i]
     executeCommand(command)
+command = "sudo apt-get update"
+executeCommand(command)
 
+command = "sudo python3 -m pip install -r ../Settings/System/Requirements.txt"
+executeCommand(command)
 
 print(" >> ", "Done")
