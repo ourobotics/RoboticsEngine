@@ -24,20 +24,27 @@ import subprocess
 # ||=======================||
 # ||=======================================================================||
 
+
 def executeCommand(command):
     print (" >> ",command)
     subprocess.run(command.split())
 
+def run():
+    pythonBinary = input("Please specify your Python Binary (e.g. 'python3' foo.py): ")
+    if (pythonBinary == ''):
+        pythonBinary = "python3"
 
-file = open("../Settings/System/PackageList.package", 'r')
-packages = file.readlines()
-for i in range(len(packages)):
-    command = "sudo apt-get install " + packages[i]
+    file = open("../Settings/System/PackageList.package", 'r')
+    packages = file.readlines()
+    for i in range(len(packages)):
+        command = "sudo apt-get install " + packages[i]
+        executeCommand(command)
+    command = "sudo apt-get update"
     executeCommand(command)
-command = "sudo apt-get update"
-executeCommand(command)
 
-command = "sudo python3 -m pip install -r ../Settings/System/Requirements.txt"
-executeCommand(command)
+    command = "sudo " + pythonBinary + " -m pip install -r ../Settings/System/Requirements.txt"
+    executeCommand(command)
 
-print(" >> ", "Done")
+    print(" >> ", "Done")
+
+run()
