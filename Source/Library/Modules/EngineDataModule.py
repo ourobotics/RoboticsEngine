@@ -14,6 +14,7 @@ from ConfigLoader import ConfigLoader
 from DebugLogger import DebugLogger
 # Library/Controllers
 from EngineDataController import EngineDataController
+from CommunicationController import CommunicationController
 # Library/Cache
 # Premades
 from time import sleep, time, strftime, localtime
@@ -67,12 +68,14 @@ class EngineDataModule():
 
 		# ||=======================||
 
-		self.communicationThread = Thread(target = self.engineDataController.communicationModule)
-		self.communicationThread.setDaemon(True)
-		self.communicationThread.start()
+		# self.communicationThread = Thread(target = self.engineDataController.communicationModule)
+		# self.communicationThread.setDaemon(True)
+		# self.communicationThread.start()
 
-		logMessage = "communicationThread Started"
-		self.debugLogger.log("Standard", self.type, logMessage)
+		print(ModuleApi.communicationModule())
+
+		# logMessage = "communicationThread Started"
+		# self.debugLogger.log("Standard", self.type, logMessage)
 		
 		# ||=======================||
 

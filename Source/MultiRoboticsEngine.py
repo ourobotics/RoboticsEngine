@@ -120,6 +120,7 @@ class RoboticsEngine(object):
 				while (dataRecv == None):
 					for i in range(len(self.parentPipes)):
 						pipe = self.parentPipes[i]
+						# print("Pipe:",i)
 						try:
 							if (pipe.poll(0.5)):
 								dataRecv = pipe.recv() * 3
@@ -152,20 +153,26 @@ class RoboticsEngine(object):
 		# ||=======================||
 		# NetworkClient Pipes
 		# NetworkClient <- ControllerDataSync Pipe
-		self.NC_DSC_ppipe, self.NC_DSC_cpipe = Pipe()
-		# NetworkClient <- EngineDataController Pipe
-		self.NC_EDC_ppipe, self.NC_EDC_cpipe = Pipe()
+		# self.NC_DSC_ppipe, self.NC_DSC_cpipe = Pipe()
+		# # NetworkClient <- EngineDataController Pipe
+		# self.NC_EDC_ppipe, self.NC_EDC_cpipe = Pipe()
 		
-		# ||=======================||
-		# EngineDataController Pipes
-		# EngineDataController <- ControllerDataSync Pipe
-		self.EDC_DSC_ppipe, self.EDC_DSC_cpipe = Pipe()
+		# # ||=======================||
+		# # EngineDataController Pipes
+		# # EngineDataController <- ControllerDataSync Pipe
+		# self.EDC_DSC_ppipe, self.EDC_DSC_cpipe = Pipe()
 
-		# ||=======================||
-		# RoboticsEngine Pipes
-		# RoboticsEngine <- EngineDataController
-		self.MRE_EDC_ppipe, self.MRE_EDC_cpipe = Pipe()
-		self.parentPipes.append(self.MRE_EDC_ppipe)
+		# # ||=======================||
+		# # RoboticsEngine Pipes
+		# # RoboticsEngine <- EngineDataController
+		# self.MRE_EDC_ppipe, self.MRE_EDC_cpipe = Pipe()
+		# self.parentPipes.append(self.MRE_EDC_ppipe)
+
+		self.parentPipes = []
+		self.childPipes = []
+
+
+		# self.testppipe, self.testcpipe = Pipe()
 
 
 		# ||=======================||
@@ -173,11 +180,11 @@ class RoboticsEngine(object):
 		if (self.useNetworkClient):
 			# ||=======================||
 			# Parent Pipes
-			self.networkClientModule.networkClient.pushParentPipe(self.NC_DSC_ppipe)
-			self.networkClientModule.networkClient.pushParentPipe(self.NC_EDC_ppipe)
+			# self.networkClientModule.networkClient.pushParentPipe(self.NC_DSC_ppipe)
+			# self.networkClientModule.networkClient.pushParentPipe(self.NC_EDC_ppipe)
 			# ||=======================||
 			# Child Pipes
-			self.networkClientModule.controllerDataSync.pushChildPipe("EngineDataController", self.EDC_DSC_cpipe)
+			# self.networkClientModule.controllerDataSync.pushChildPipe("EngineDataController", self.EDC_DSC_cpipe)
 
 			self.networkClientProcess = Process(target = self.networkClientModule.createProcess)
 			self.networkClientProcess.daemon = True
@@ -186,11 +193,17 @@ class RoboticsEngine(object):
 		if (self.useEngineDataController):
 			# ||=======================||
 			# Parent Pipes
-			self.engineDataModule.engineDataController.pushParentPipe(self.EDC_DSC_ppipe)
+			# self.engineDataModule.engineDataController.pushParentPipe(self.EDC_DSC_ppipe)
+
 			# ||=======================||
 			# Child Pipes
-			self.engineDataModule.engineDataController.pushChildPipe("NetworkClient",  self.NC_EDC_cpipe)
-			self.engineDataModule.engineDataController.pushChildPipe("RoboticsEngine", self.MRE_EDC_cpipe)
+			# self.engineDataModule.engineDataController.pushChildPipe("NetworkClient",  self.NC_EDC_cpipe)
+			# self.engineDataModule.engineDataController.pushChildPipe("RoboticsEngine", self.MRE_EDC_cpipe)
+			# parentPipe, childPipe = Pipe()
+			# self.parentPipes.append(parentPipe)
+			# self.childPipes.append(childPipe)
+			# self.engineDataModule.engineDataController.pushChildPipe("RoboticsEngine", childPipe)
+
 			# ||=======================||
 
 			self.engineDataControllerProcess = Process(target = self.engineDataModule.createProcess)
