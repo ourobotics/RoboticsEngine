@@ -35,11 +35,13 @@ class CacheModule:
 
     def setLiveData(self, data):
         self.controllerCache["LiveData"] = data
+        return True
 
     # ||=======================||
     # InteralLog Helpers
     def pushInternalLog(self, data):
         self.controllerCache["InternalLog"].append(data)
+        return True
 
     def getInternalLog(self, i):
         if (i == None):

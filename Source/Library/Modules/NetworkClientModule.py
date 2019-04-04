@@ -16,6 +16,7 @@ from DebugLogger import DebugLogger
 from NetworkClient import NetworkClient
 # Library/Controllers
 from ControllerDataSync import ControllerDataSync
+from CommunicationController import CommunicationController
 # Import Modules
 from time import sleep, time, strftime, localtime
 from socket import timeout
@@ -47,6 +48,7 @@ class NetworkClientModule(NetworkClient):
 		# Program Classes
 		self.networkClient = NetworkClient()
 		self.controllerDataSync = ControllerDataSync(self.networkClient)
+		self.communicationController = CommunicationController(self.type)
 
 		# ||=======================||
 
@@ -62,10 +64,19 @@ class NetworkClientModule(NetworkClient):
 			ast.literal_eval(self.config["Warning"]),
 			ast.literal_eval(self.config["Error"]))
 
+		# ||=======================||
+		# Defaults
+		self.pipes = {}
+
 # ||=======================================================================||
 
 	def updateProcessMemorySize(self):
 		self.processMemorySize = int(int(process.memory_info().rss) / 1000000)
+
+# ||=======================================================================||
+
+	def updatePipes(self, type, pipe):
+		self.pipes[type] = pipe
 
 # ||=======================================================================||
 
@@ -74,10 +85,15 @@ class NetworkClientModule(NetworkClient):
 		self.debugLogger.log("Standard", self.type, logMessage)
 
 		# ||=======================||
-		self.communicationThread = Thread(target = self.networkClient.communicationModule)
-		self.communicationThread.setDaemon(True)
-		self.communicationThread.start()
-		
+		# CommunicationController
+		self.communicationController.updateConnectionList(("NetworkClient", self.networkClient))
+		self.communicationController.updateConnectionList(("ControllerDataSync", self.controllerDataSync))
+		self.communicationController.updatePipes(self.pipes)
+
+		self.communicationControllerThread = Thread(target = self.communicationController.runAPI)
+		self.communicationControllerThread.setDaemon(True)
+		self.communicationControllerThread.start()
+
 		logMessage = "communicationThread Started"
 		self.debugLogger.log("Standard", self.type, logMessage)
 

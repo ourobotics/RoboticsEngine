@@ -69,12 +69,7 @@ class NetworkClient:
 		self.connectionStatus = False
 		self.connectionHolder = socket.socket()
 		self.socketTimeout = 1
-		self.parentPipes = []
-
-		# ||=======================||
-		# Inheritance
 		
-
 # ||=======================================================================||
 
 	def updateCurrentDuty(self, duty):
@@ -110,30 +105,13 @@ class NetworkClient:
 
 # ||=======================================================================||
 
-	def pushParentPipe(self, pipe):
-		self.parentPipes.append(pipe)	
+	def APICommand(self, data):
+		newData = data *3
+		command = newData[0]
+		params = newData[1:]
 
-# ||=======================================================================||
-
-	def communicationModule(self):
-		while (1):
-			if (len(self.parentPipes) != 0):
-				dataRecv = None
-				while (dataRecv == None):
-					for i in range(len(self.parentPipes)):
-						pipe = self.parentPipes[i]
-						# print("Pipe:",i)
-						try:
-							if (pipe.poll(0.5)):
-								dataRecv = pipe.recv() * 3
-								break
-						except Exception as e:
-							print(e)
-
-				logMessage = "Reading From Pipe: " + str(dataRecv)
-				self.debugLogger.log("Debug", self.type, logMessage)
-
-				interactionAccess = {
+		try:
+			interactionExecution = {
 					"pingServer": partial(self.pingServer),
 					"jsonify": partial(self.jsonify),
 					"sendJson": partial(self.sendJson, dataRecv[1], dataRecv[2]),
@@ -141,13 +119,54 @@ class NetworkClient:
 					"updateDuty": partial(self.updateCurrentDuty, dataRecv[1]),
 					"isOnline": partial(self.isOnline)
 				}
-				returnData = interactionAccess[dataRecv[0]]()
-				# print(returnData)
 
-				logMessage = "Executing Pipe Command: " + str([dataRecv[0]])
-				self.debugLogger.log("Debug", self.type, logMessage)
+			executeCommand = interactionExecution[command]
+			executeData = executeCommand()
+		except Exception as e:
+			logMessage = "Failure To Execute Command" + str(data)
+			self.debugLogger.log("Debug", self.type, logMessage)
+			return False
 
-				pipe.send(returnData)
+		logMessage = "Pipe Command Executed: " + str(data)
+		self.debugLogger.log("Debug", self.type, logMessage)
+
+		return executeData
+
+# # ||=======================================================================||
+
+# 	def communicationModule(self):
+# 		while (1):
+# 			if (len(self.parentPipes) != 0):
+# 				dataRecv = None
+# 				while (dataRecv == None):
+# 					for i in range(len(self.parentPipes)):
+# 						pipe = self.parentPipes[i]
+# 						# print("Pipe:",i)
+# 						try:
+# 							if (pipe.poll(0.5)):
+# 								dataRecv = pipe.recv() * 3
+# 								break
+# 						except Exception as e:
+# 							print(e)
+
+# 				logMessage = "Reading From Pipe: " + str(dataRecv)
+# 				self.debugLogger.log("Debug", self.type, logMessage)
+
+# 				interactionAccess = {
+# 					"pingServer": partial(self.pingServer),
+# 					"jsonify": partial(self.jsonify),
+# 					"sendJson": partial(self.sendJson, dataRecv[1], dataRecv[2]),
+# 					"closeConnection": partial(self.closeConnection),
+# 					"updateDuty": partial(self.updateCurrentDuty, dataRecv[1]),
+# 					"isOnline": partial(self.isOnline)
+# 				}
+# 				returnData = interactionAccess[dataRecv[0]]()
+# 				# print(returnData)
+
+# 				logMessage = "Executing Pipe Command: " + str([dataRecv[0]])
+# 				self.debugLogger.log("Debug", self.type, logMessage)
+
+# 				pipe.send(returnData)
 
 # ||=======================================================================||
 

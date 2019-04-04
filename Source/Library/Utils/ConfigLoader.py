@@ -29,7 +29,8 @@ class ConfigLoader(object):
 		if (filename.find('.conf')) == -1:
 			filename = filename + '.conf'
 		try:
-			config = dict(line.strip().split('=') for line in open('../Settings/Config/' + filename))   
+			config = dict(line.strip().split('=') for line in open('../Settings/Config/' + filename))
+			# print(filename)   
 			return config   
 		except Exception as e:
 			return {"Error": e}

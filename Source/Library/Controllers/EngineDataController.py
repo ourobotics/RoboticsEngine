@@ -73,16 +73,37 @@ class EngineDataController(object):
 		# ||=======================||
 		# Defaults
 		self.duty = "Inactive"
-		interactionAccess = {
-			"NetworkClient.getLiveData": partial(self.dataStorage["NetworkClient"].getLiveData),
-			"NetworkClient.setLiveData": partial(self.dataStorage["NetworkClient"].setLiveData, dataRecv),
-			"NetworkClient.getInternalLog": partial(self.dataStorage["NetworkClient"].getInternalLog, dataRecv[1]),
-			"NetworkClient.pushInternalLog": partial(self.dataStorage["NetworkClient"].pushInternalLog, dataRecv[1]),
-			"RoboticsEngine.getLiveData": partial(self.dataStorage["RoboticsEngine"].getLiveData),
-			"RoboticsEngine.setLiveData": partial(self.dataStorage["RoboticsEngine"].setLiveData, dataRecv[1]),
-			"RoboticsEngine.getInternalLog": partial(self.dataStorage["RoboticsEngine"].getInternalLog, dataRecv[1]),
-			"RoboticsEngine.pushInternalLog": partial(self.dataStorage["RoboticsEngine"].pushInternalLog, dataRecv[1])
-		}
+		
+# ||=======================================================================||
+
+	def APICommand(self, data):
+		newData = data *3
+		command = newData[0]
+		params = newData[1:]
+
+		try:
+			interactionExecution = {
+				"NetworkClient.getLiveData": partial(self.dataStorage["NetworkClient"].getLiveData),
+				"NetworkClient.setLiveData": partial(self.dataStorage["NetworkClient"].setLiveData, params[1]),
+				"NetworkClient.getInternalLog": partial(self.dataStorage["NetworkClient"].getInternalLog, params[1]),
+				"NetworkClient.pushInternalLog": partial(self.dataStorage["NetworkClient"].pushInternalLog, params[1]),
+				"RoboticsEngine.getLiveData": partial(self.dataStorage["RoboticsEngine"].getLiveData),
+				"RoboticsEngine.setLiveData": partial(self.dataStorage["RoboticsEngine"].setLiveData, params[1]),
+				"RoboticsEngine.getInternalLog": partial(self.dataStorage["RoboticsEngine"].getInternalLog, params[1]),
+				"RoboticsEngine.pushInternalLog": partial(self.dataStorage["RoboticsEngine"].pushInternalLog, params[1])
+			}
+
+			executeCommand = interactionExecution[command]
+			executeData = executeCommand()
+		except Exception as e:
+			logMessage = "Failure To Execute Command" + str(data)
+			self.debugLogger.log("Debug", self.type, logMessage)
+			return False
+
+		logMessage = "Pipe Command Executed: " + str(data)
+		self.debugLogger.log("Debug", self.type, logMessage)
+
+		return executeData
 
 # ||=======================================================================||
 
@@ -112,83 +133,6 @@ class EngineDataController(object):
 			}
 		}
 		
-# ||=======================================================================||
-
-	# def pushChildPipe(self, _class, pipe):
-	# 	self.childPipes.append((_class, pipe))
-
-# ||=======================================================================||
-
-	# def pipeCommand(self, command, pipe):
-	# 	pipe.send(command)
-	# 	returnData = "Empty"
-	# 	for i in range(10):
-	# 		if (pipe.poll(0.5)):
-	# 			returnData = pipe.recv()
-	# 			return returnData
-	# 	if (returnData == "Empty"):
-	# 		logMessage = "Failed To Recieve Data From The Pipe"
-	# 		self.debugLogger.log("Error", self.type, logMessage)
-	
-	# 		returnData = None
-	# 		return returnData
-
-# ||=======================================================================||
-
-	# def pushParentPipe(self, pipe):
-	# 	self.parentPipes.append(pipe)	
-
-# ||=======================================================================||
-
-	# def communicationModule(self):
-	# 	while (1):
-	# 		if (len(self.parentPipes) != 0):
-	# 			dataRecv = None
-	# 			while (dataRecv == None):
-	# 				for i in range(len(self.parentPipes)):
-	# 					pipe = self.parentPipes[i]
-	# 					# print("Pipe:",i)
-	# 					try:
-	# 						if (pipe.poll(0.5)):
-	# 							print("read")
-	# 							dataRecv = pipe.recv() * 3
-	# 					except Exception as e:
-	# 						print(e)
-	# 			# print(dataRecv)
-
-	# 			logMessage = "Reading From Pipe"
-	# 			self.debugLogger.log("Debug", self.type, logMessage)
-
-	# 			interactionAccess = {
-	# 				"NetworkClient.getLiveData": partial(self.dataStorage["NetworkClient"].getLiveData),
-	# 				"NetworkClient.setLiveData": partial(self.dataStorage["NetworkClient"].setLiveData, dataRecv[1]),
-	# 				"NetworkClient.getInternalLog": partial(self.dataStorage["NetworkClient"].getInternalLog, dataRecv[1]),
-	# 				"NetworkClient.pushInternalLog": partial(self.dataStorage["NetworkClient"].pushInternalLog, dataRecv[1]),
-	# 				"RoboticsEngine.getLiveData": partial(self.dataStorage["RoboticsEngine"].getLiveData),
-	# 				"RoboticsEngine.setLiveData": partial(self.dataStorage["RoboticsEngine"].setLiveData, dataRecv[1]),
-	# 				"RoboticsEngine.getInternalLog": partial(self.dataStorage["RoboticsEngine"].getInternalLog, dataRecv[1]),
-	# 				"RoboticsEngine.pushInternalLog": partial(self.dataStorage["RoboticsEngine"].pushInternalLog, dataRecv[1])
-	# 			}
-	# 			try:
-	# 				toUse = self.useCache[dataRecv[0]]
-	# 			except KeyError:
-	# 				toUse = False
-
-	# 			if (toUse == False):
-	# 				logMessage = "Pipe Command Denied: " + str(dataRecv)
-	# 				self.debugLogger.log("Error", self.type, logMessage)
-	# 				pipe.send("Denied")
-	# 				return 0
-	# 			else:
-	# 				returnData = interactionAccess[dataRecv[0]]()
-
-	# 				logMessage = "Executing Pipe Command: " + str(dataRecv)
-	# 				self.debugLogger.log("Debug", self.type, logMessage)
-
-	# 				pipe.send(returnData)
-	# 				return 0
-	# 			return 0
-
 # ||=======================================================================||
 
 	def syncEngineData(self):

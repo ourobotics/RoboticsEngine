@@ -40,6 +40,7 @@ class EngineDataModule():
 		# ||=======================||
 		# Program Classes
 		self.engineDataController = EngineDataController()
+		self.communicationController = CommunicationController(self.type)
 
 		# ||=======================||
 
@@ -55,10 +56,19 @@ class EngineDataModule():
 			ast.literal_eval(self.config["Warning"]),
 			ast.literal_eval(self.config["Error"]))
 
+		# ||=======================||
+		# Defaults
+		self.pipes = {}
+		
 # ||=======================================================================||
 
 	def updateProcessMemorySize(self):
 		self.processMemorySize = int(int(process.memory_info().rss) / 1000000)
+
+# ||=======================================================================||
+
+	def updatePipes(self, type, pipe):
+		self.pipes[type] = pipe
 
 # ||=======================================================================||
 
@@ -67,15 +77,16 @@ class EngineDataModule():
 		self.debugLogger.log("Standard", self.type, logMessage)
 
 		# ||=======================||
+		# CommunicationController
+		self.communicationController.updateConnectionList(("EngineDataController", self.engineDataController))
+		self.communicationController.updatePipes(self.pipes)
 
-		# self.communicationThread = Thread(target = self.engineDataController.communicationModule)
-		# self.communicationThread.setDaemon(True)
-		# self.communicationThread.start()
+		self.communicationControllerThread = Thread(target = self.communicationController.runAPI)
+		self.communicationControllerThread.setDaemon(True)
+		self.communicationControllerThread.start()
 
-		print(ModuleApi.communicationModule())
-
-		# logMessage = "communicationThread Started"
-		# self.debugLogger.log("Standard", self.type, logMessage)
+		logMessage = "communicationThread Started"
+		self.debugLogger.log("Standard", self.type, logMessage)
 		
 		# ||=======================||
 
@@ -86,12 +97,14 @@ class EngineDataModule():
 		logMessage = "syncEngineDataThread Started"
 		self.debugLogger.log("Standard", self.type, logMessage)
 
+		self.communicationController.requestSubscription(self.type)
+
 		try:
 			while(1):
 				self.updateProcessMemorySize()
 				logMessage = "Current Size In Megabytes: " + str(self.processMemorySize)
 				self.debugLogger.log("Debug", self.type, logMessage)
-				sleep(10)
+				sleep(2)
 		except KeyboardInterrupt as e:
 			print('\r', end='')
 			logMessage = "Process Joined"
